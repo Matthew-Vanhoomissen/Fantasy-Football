@@ -1,0 +1,16 @@
+import pandas as pd
+
+
+# Load the csv
+pbp = pd.read_csv("../data/play_by_play_2025.csv", low_memory=False)
+
+# Search for a specific player
+player_name = "J.Allen"
+
+# Filter the dataframe
+player_data = pbp[pbp['name'] == player_name]
+
+# Save to new csv
+player_output_path = f"../data/{player_name.replace(' ', '_')}_data_{2025}.csv"
+player_data.to_csv(player_output_path, index=False)
+print(f"Data saved to {player_output_path}")
