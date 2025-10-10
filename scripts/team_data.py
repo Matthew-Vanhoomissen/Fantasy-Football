@@ -4,7 +4,7 @@ import pandas as pd
 pbp = pd.read_csv("../data/play_by_play_2025.csv", low_memory=False)
 
 # selected team
-team_name = "GB"
+team_name = "BAL"
 
 # filter the dataframe
 team_data = pbp[(pbp['home_team'] == team_name) | (pbp['away_team'] == team_name)]

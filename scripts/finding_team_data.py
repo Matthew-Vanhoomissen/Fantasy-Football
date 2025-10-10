@@ -3,8 +3,9 @@ import pandas as pd
 # load csv file
 team_data = pd.read_csv("../data/team_data_2025.csv", low_memory=False)
 
-team_name = "GB"
+team_name = "BAL"
 
+# all offensive plays
 offensive_plays = team_data[
     (team_data['posteam'] == team_name) & 
     (team_data['play_type'].isin(['pass', 'run'])) &
@@ -17,6 +18,8 @@ offensive_plays = team_data[
     (team_data['two_point_attempt'] == 0)
 ]
 
+# average, total, rush, and passing epa
+
 total_epa = offensive_plays['epa'].sum()
 total_plays = len(offensive_plays)
 epa_per_play = total_epa / total_plays
@@ -24,3 +27,44 @@ epa_per_play = total_epa / total_plays
 print(f"Total offensive EPA: {total_epa}")
 print(f"Total plays: {total_plays}")
 print(f"EPA per play: {epa_per_play}")
+
+pass_plays = team_data[
+    (team_data['posteam'] == team_name) & 
+    (team_data['play_type'] == 'pass')
+]
+
+total_pass_epa = pass_plays['epa'].sum()
+total_pass_plays = len(pass_plays)
+epa_per_pass = total_pass_epa / total_pass_plays
+
+print(f"Total pass epa: {total_pass_epa}")
+print(f"EPA per pass: {epa_per_pass}")
+
+run_plays = team_data[
+    (team_data['posteam'] == team_name) &
+    (team_data['play_type'] == 'run')
+]
+
+total_rush_epa = run_plays['epa'].sum()
+total_rush_plays = len(run_plays)
+epa_per_rush = total_rush_epa / total_rush_plays
+
+print(f"Total rush epa: {total_rush_epa}")
+print(f"Epa per rush: {epa_per_rush}")
+
+# Play type percentage
+all_plays = team_data[
+    (team_data['posteam'] == team_name) &
+    (team_data['play_type'].isin(['pass', 'run']))
+]
+
+all_num_plays = len(all_plays)
+all_pass_plays = len(all_plays[all_plays['play_type'] == 'pass'])
+all_rush_plays = len(all_plays[all_plays['play_type'] == 'run'])
+
+pass_percent = (all_pass_plays / all_num_plays) * 100
+rush_percent = (all_rush_plays / all_num_plays) * 100
+
+print(f"Total offensive plays: {all_num_plays}")
+print(f"Pass plays: {all_pass_plays} ({pass_percent:.1f}%)")
+print(f"Run plays: {all_rush_plays} ({rush_percent:.1f}%)")
