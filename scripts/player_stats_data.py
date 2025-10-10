@@ -42,6 +42,12 @@ print("")
 # fantasy scoring for a single week
 weeks = sorted(pdp['week'].unique())
 
+# Arrays to store week difference
+positive_difference = []
+negative_difference = []
+boom_games = 0
+bust_games = 0
+# Goes through each week to find that weeks player data
 for week_num in weeks:
     week_data = pdp[pdp['week'] == week_num]
     
@@ -53,6 +59,48 @@ for week_num in weeks:
     pTd = week_data['pass_touchdown'].sum()
     rtd = week_data[week_data['rusher_player_name'] == 'J.Allen']['rush_touchdown'].sum()
     
-    total_F_Points = (total_P_Yards * .04) + (total_R_Yards * .1) + (receiving_yards * .1) - (interceptions * 2) + (pTd * 4) + (rtd * 6) - (fumbles_lost * 2)
+    # Fantasty points from that week
+    total_F_Points_W = (total_P_Yards * .04) + (total_R_Yards * .1) + (receiving_yards * .1) - (interceptions * 2) + (pTd * 4) + (rtd * 6) - (fumbles_lost * 2)
     
-    print(f"Week {week_num}: {total_F_Points} fantasy points")
+    print(f"Week {week_num}: {total_F_Points_W} fantasy points")
+
+    # difference of that week from average
+    week_difference = ((total_F_Points_W - average_F_Points) / average_F_Points)
+    week_diff_amount = (total_F_Points_W - average_F_Points)
+
+    # if over or under a threshhold add to array that stores the percentage it went over or under
+    if week_diff_amount > 10: 
+        boom_games = boom_games + 1
+        positive_difference.append(week_difference)
+    elif week_diff_amount < -10: 
+        bust_games = bust_games + 1
+        negative_difference.append(week_difference)
+
+# Averages out how much it went over or under for those games
+pos_total = 0
+for num in positive_difference: 
+    pos_total = pos_total + num
+
+pos_average = ((pos_total / len(positive_difference)) * 100) if boom_games else 0
+print(f"Of all games, the player boomed: {boom_games} and went over the average by: {pos_average}") if boom_games else 0
+
+neg_total = 0
+for num in negative_difference:
+    neg_total = neg_total + (-num)
+
+neg_average = ((neg_total / len(negative_difference)) * 100) if bust_games else 0
+print(f"Of all games, the player bust: {bust_games} and went over the average by: {neg_average}") if bust_games else 0
+
+# if boom and bust games are not zero, calculate the boom/bust points as the 
+# multiplication of the average bust/boom percentage and the average fantasy points
+if boom_games > 0:
+    boom_points = ((pos_average / 100) + 1) * average_F_Points
+else: 
+    boom_points = average_F_Points
+
+if bust_games > 0:
+    bust_points = ((neg_average / 100)) * average_F_Points
+else: 
+    bust_points = average_F_Points
+
+print(f"Prediction: --bust({bust_games / games_played}): {bust_points} -- average points: {average_F_Points} -- boom({boom_games / games_played}): {boom_points}")
