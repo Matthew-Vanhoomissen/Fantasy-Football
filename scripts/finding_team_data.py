@@ -28,9 +28,8 @@ print(f"Total offensive EPA: {total_epa}")
 print(f"Total plays: {total_plays}")
 print(f"EPA per play: {epa_per_play}")
 
-pass_plays = team_data[
-    (team_data['posteam'] == team_name) & 
-    (team_data['play_type'] == 'pass')
+pass_plays = offensive_plays[
+    (offensive_plays['play_type'] == 'pass')
 ]
 
 total_pass_epa = pass_plays['epa'].sum()
@@ -40,9 +39,8 @@ epa_per_pass = total_pass_epa / total_pass_plays
 print(f"Total pass epa: {total_pass_epa}")
 print(f"EPA per pass: {epa_per_pass}")
 
-run_plays = team_data[
-    (team_data['posteam'] == team_name) &
-    (team_data['play_type'] == 'run')
+run_plays = offensive_plays[
+    (offensive_plays['play_type'] == 'run')
 ]
 
 total_rush_epa = run_plays['epa'].sum()
