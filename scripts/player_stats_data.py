@@ -1,4 +1,5 @@
 import pandas as pd
+from target_percentage import get_percentage
 
 pdp = pd.read_csv("../data/player1_data_2025.csv", low_memory=False)
 print("Player stats")
@@ -136,3 +137,4 @@ for week in weeks[-3:]:
 
 three_week_average = last_three_weeks / 3
 print(f"The total average is {average_F_Points} points, over the past 3 weeks the average is {three_week_average} points")
+get_percentage("GB", "T.Kraft")
