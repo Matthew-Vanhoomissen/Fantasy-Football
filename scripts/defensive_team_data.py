@@ -1,9 +1,10 @@
 import pandas as pd
 
-team_data = pd.read_csv("../data/team_data_2025.csv", low_memory=False)
 
+def get_defensive_data(team_nameI, team_data): 
+    # Make empty array
+    defensive_stats = []
 
-def get_defensive_data(team_nameI): 
     team_name = team_nameI
 
     # all defensive plays
@@ -71,3 +72,16 @@ def get_defensive_data(team_nameI):
     points_allowed = (touchdowns_allowed * 6) + (field_goals_allowed * 3) + extra_points_allowed + (two_point_conversions * 2)
 
     print(f"Total points allowed by {team_name} defense: {points_allowed}")
+
+    defensive_stats.append({
+        'team_name': team_name,
+        'allowed_passing_yards': passing_yards,
+        'allowed_rushing_yards': rushing_yards,
+        'sack_yards': sack_yards,
+        'total_epa_against': epa_against,
+        'pass_epa_against': pass_epa_play,
+        'rush_epa_against': rush_epa_play,
+        'points_against': points_allowed
+    })
+
+    return pd.DataFrame(defensive_stats)

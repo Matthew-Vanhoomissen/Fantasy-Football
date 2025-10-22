@@ -1,9 +1,9 @@
 import pandas as pd
 
 
-def get_percentage(team_name, player_name):
-    # load csv
-    pbp = pd.read_csv("../data/play_by_play_2025.csv", low_memory=False)
+def get_percentage(team_name, player_name, pbp):
+    # Make array
+    percentage_data = []
 
     # Find target share percentage
     all_passing_plays = pbp[
@@ -31,6 +31,13 @@ def get_percentage(team_name, player_name):
     percentR = len(player_rushing_plays) / len(all_rushing_plays)
     print(f"Of all {len(all_rushing_plays)} rushing plays, the player was rushed {len(player_rushing_plays)} times for a carry percentage of {percentR}")
 
+    percentage_data.append({
+        'player_name': player_name,
+        'passing_target_percentage': percent,
+        'rushing_percentage': percentR
+    })
+
+    return pd.DataFrame(percentage_data)
 
 
     
