@@ -3,6 +3,7 @@ import pandas as pd
 from defensive_team_data import get_defensive_data
 from finding_team_data import get_offensive_data
 from player_stats_data import get_player_data
+from player_stats_data import get_player_week_data
 from make_csv import create_csvs
 
 all_data = pd.read_csv("../data/play_by_play_2025.csv", low_memory=False)
@@ -60,3 +61,5 @@ final2 = (
 
 all_stats = pd.concat([final1, final2], ignore_index=True)
 print(all_stats)
+
+

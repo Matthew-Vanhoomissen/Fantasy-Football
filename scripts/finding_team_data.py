@@ -98,6 +98,8 @@ def get_offensive_week_data(team_name, team_data, week):
         (team_data['two_point_attempt'] == 0) &
         (team_data['week'] < week)
     ]
+    if len(offensive_plays) == 0:
+        return None
 
     # average, total, rush, and passing epa
 
@@ -105,20 +107,13 @@ def get_offensive_week_data(team_name, team_data, week):
     total_plays = len(offensive_plays)
     epa_per_play = total_epa / total_plays
 
-    print(f"Total offensive EPA: {total_epa}")
-    print(f"Total plays: {total_plays}")
-    print(f"EPA per play: {epa_per_play}")
-
     pass_plays = offensive_plays[
-        (offensive_plays['play_type'] == 'pass')
+        (offensive_plays['play_type'] == 'pass') 
     ]
 
     total_pass_epa = pass_plays['epa'].sum()
     total_pass_plays = len(pass_plays)
     epa_per_pass = total_pass_epa / total_pass_plays
-
-    print(f"Total pass epa: {total_pass_epa}")
-    print(f"EPA per pass: {epa_per_pass}")
 
     run_plays = offensive_plays[
         (offensive_plays['play_type'] == 'run')
@@ -128,13 +123,11 @@ def get_offensive_week_data(team_name, team_data, week):
     total_rush_plays = len(run_plays)
     epa_per_rush = total_rush_epa / total_rush_plays
 
-    print(f"Total rush epa: {total_rush_epa}")
-    print(f"Epa per rush: {epa_per_rush}")
-
     # Play type percentage
     all_plays = team_data[
         (team_data['posteam'] == team_name) &
-        (team_data['play_type'].isin(['pass', 'run']))
+        (team_data['play_type'].isin(['pass', 'run'])) & 
+        (team_data['week'] < week)
     ]
 
     all_num_plays = len(all_plays)
@@ -143,10 +136,6 @@ def get_offensive_week_data(team_name, team_data, week):
 
     pass_percent = (all_pass_plays / all_num_plays) * 100
     rush_percent = (all_rush_plays / all_num_plays) * 100
-
-    print(f"Total offensive plays: {all_num_plays}")
-    print(f"Pass plays: {all_pass_plays} ({pass_percent:.1f}%)")
-    print(f"Run plays: {all_rush_plays} ({rush_percent:.1f}%)")
 
     offensive_stats.append({
         'week': week,
