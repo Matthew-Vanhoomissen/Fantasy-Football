@@ -19,7 +19,7 @@ for player_name in players:
     
     offensive_team_name = get_player_team(all_data, player_name)
     offensive_team_data3, player_data3 = create_csvs_offense(all_data, player_name, offensive_team_name, 3)
-    for num in range(1, 5):
+    for num in range(1, 8):
         week = num
 
         print(week)
@@ -32,6 +32,10 @@ for player_name in players:
             continue
 
         defensive_stats3 = get_defensive_week_data(defensive_team_name, defensive_team_data3, week)
+        if defensive_stats3 is None:
+            print(f"No defensive stats for week {week}")
+            continue
+
         player_stats3 = get_player_week_data(player_name, offensive_team_name, player_data3, all_data, week)
         if player_stats3 is None:
             print(f"Player did not participate this week {week}")
@@ -52,5 +56,10 @@ for player_name in players:
 
         all_player_data.append(final3)
 
-final_data = pd.concat(all_player_data, ignore_index=True)
+season_data = pd.concat(all_player_data, ignore_index=True)
+season_2024 = pd.read_csv("../data/training_dataset_2024.csv", low_memory=False)
+
+season_data['season'] = 2025
+season_2024['season'] = 2024
+final_data = pd.concat([season_2024, season_data], ignore_index=True)
 final_data.to_csv("../data/training_dataset.csv", index=False)
