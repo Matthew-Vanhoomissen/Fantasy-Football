@@ -32,3 +32,4 @@ final1 = (
     .merge(defensive_stats1, how="left", left_on="def_team_name", right_on="def_team_name")
 )
 
+print(final1)

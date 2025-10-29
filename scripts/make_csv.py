@@ -1,7 +1,7 @@
 import pandas as pd 
 
 
-def create_csvs_offense(pbp, player_name, offensive_team_name, key):
+def create_csvs_offense(pbp, player_name, offensive_team_name):
 
     # filter the dataframe
     offensive_team_data = pbp[(pbp['home_team'] == offensive_team_name) | (pbp['away_team'] == offensive_team_name)]
