@@ -20,6 +20,8 @@ def get_defensive_data(team_nameI, team_data):
         (team_data['two_point_attempt'] == 0)
     ]
 
+    games_played = defensive_plays['week'].nunique()
+    
     # allowed passing yards
     passing_yards = defensive_plays[defensive_plays['play_type'] == 'pass']['passing_yards'].sum()
     print(f"Allowed {passing_yards} passing yards")
@@ -75,13 +77,13 @@ def get_defensive_data(team_nameI, team_data):
 
     defensive_stats.append({
         'team_name': team_name,
-        'allowed_passing_yards': passing_yards,
-        'allowed_rushing_yards': rushing_yards,
-        'sack_yards': sack_yards,
-        'total_epa_against': epa_against,
+        'allowed_passing_yards': passing_yards / games_played,
+        'allowed_rushing_yards': rushing_yards / games_played,
+        'sack_yards': sack_yards / games_played,
+        'avg_epa_against': epa_per_play,
         'pass_epa_against': pass_epa_play,
         'rush_epa_against': rush_epa_play,
-        'points_against': points_allowed
+        'points_against': points_allowed / games_played
         
     })
 
