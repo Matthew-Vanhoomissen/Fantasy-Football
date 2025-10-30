@@ -22,7 +22,7 @@ player_stats1 = get_player_data(player_name, offensive_team_name, player_data1, 
 
 offensive_stats1 = offensive_stats1.rename(columns={"team_name": "off_team_name"})
 defensive_stats1 = defensive_stats1.rename(columns={"team_name": "def_team_name"})
-player_stats1 = player_stats1.rename(columns={"team_name": "off_team_name"})  
+player_stats1 = player_stats1.rename(columns={"team_name": "off_team_name"})
 
 player_stats1["def_team_name"] = defensive_team_name
 

@@ -3,6 +3,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error, r2_score
 from xgboost import XGBRegressor
 import numpy as np
+import pickle
+import os
 
 data = pd.read_csv("../data/training_dataset.csv", low_memory=False)
 
@@ -96,3 +98,22 @@ importance = pd.DataFrame({
 
 print("\nTop 10 Most Important Features:")
 print(importance.head(10))
+
+
+# Save the model and necessary components
+model_data = {
+    'model': model,
+    'feature_cols': feature_cols,
+    'scaler_mean': x_train.mean(),
+    'scaler_std': x_train.std()
+}
+
+# Create models directory if it doesn't exist
+
+os.makedirs("../models", exist_ok=True)
+
+# Save to file
+with open('../models/fantasy_model.pkl', 'wb') as f:
+    pickle.dump(model_data, f)
+
+print("✅ Model saved to ../models/fantasy_model.pkl")
