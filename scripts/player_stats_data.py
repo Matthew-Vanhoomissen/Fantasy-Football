@@ -166,7 +166,6 @@ def get_player_week_data(player_name, team_name, team_data, all_stats, week_inpu
 
     pdp = team_data[team_data['week'] < week_input]
 
-    # Most frequent opponent when that team was on offense
 
     # Make array
     player_stats = []
