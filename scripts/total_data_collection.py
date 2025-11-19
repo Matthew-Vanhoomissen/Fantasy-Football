@@ -67,6 +67,7 @@ def get_player_input(player_name, offensive_team_name, defensive_team_name, all_
     x = x.replace([np.inf, -np.inf], np.nan).fillna(0)
 
     projection = xgb_model.predict(x)
+    
     data['xgb_predicted_points'] = projection
 
     return data.iloc[0].to_dict()
@@ -121,13 +122,3 @@ def create_pair_input(player1, player1_team, player1_defense, player2, player2_t
 
     return pair
     
-
-p1 = "J.Chase"
-p1_t = "CIN"
-p1_d = "NYJ"
-
-p2 = "D.Smith"
-p2_t = "PHI"
-p2_d = "NYG"
-pair_data = create_pair_input(p1, p1_t, p1_d, p2, p2_t, p2_d)
-print(pair_data)

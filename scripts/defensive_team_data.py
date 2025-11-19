@@ -151,7 +151,7 @@ def get_defensive_week_data(team_nameI, team_data, week):
         'avg_epa_against': epa_per_play,
         'pass_epa_against': pass_epa_play,
         'rush_epa_against': rush_epa_play,
-        'points_against': points_allowed / games_played
+        'points_against': points_allowed
         
     })
 

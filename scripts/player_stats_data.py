@@ -5,10 +5,6 @@ from target_percentage import get_week_percentage
 
 def get_player_data(player_name, team_name, pdp, all_stats): 
 
-    team_name3 = pdp['posteam'].mode()[0]
-
-    # Most frequent opponent when that team was on offense
-    opponent_team3 = pdp[pdp['posteam'] == team_name]['defteam'].mode()[0]
 
     # Make array
     player_stats = []
@@ -149,6 +145,7 @@ def get_player_data(player_name, team_name, pdp, all_stats):
 
 
 def get_player_week_data(player_name, team_name, team_data, all_stats, week_input): 
+    
     week_only_data = team_data[team_data['week'] == week_input]
 
     total_P_YardsWN = week_only_data[week_only_data['passer_player_name'] == player_name]['passing_yards'].sum()
@@ -163,7 +160,7 @@ def get_player_week_data(player_name, team_name, team_data, all_stats, week_inpu
     
     # Fantasty points from that week
     total_F_Points_WN = (total_P_YardsWN * .04) + (total_R_YardsWN * .1) + (receiving_yardsWN * .1) - (interceptionsWN * 2) + (pTdWN * 4) + (rtdWN * 6) + (recTdWN * 6) - (fumbles_lostWN * 2) + (receptionsWN)
-
+    
     pdp = team_data[team_data['week'] < week_input]
 
 
