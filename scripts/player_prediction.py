@@ -109,14 +109,16 @@ def predict_start_sit(pair_df):
 
 
 if __name__ == "__main__":
-    p1 = "R.Doubs"
-    p1_t = "GB"
-    p1_d = "NYG"
+    p1 = "J.Addison"
+    p1_t = "MIN"
+    p1_d = "GB"
 
-    p2 = "J.Chase"
-    p2_t = "CIN"
-    p2_d = "NYG"
-    pair_data = create_pair_input(p1, p1_t, p1_d, p2, p2_t, p2_d)
+    p2 = "K.Shakir"
+    p2_t = "BUF"
+    p2_d = "HOU"
+
+    week = 11
+    pair_data = create_pair_input(p1, p1_t, p1_d, p2, p2_t, p2_d, week)
     pair_data = pd.DataFrame(pair_data)
     result = predict_start_sit(pair_data)
     print(result)

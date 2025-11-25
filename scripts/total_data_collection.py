@@ -2,20 +2,20 @@ import pandas as pd
 import numpy as np
 import pickle
 
-from defensive_team_data import get_defensive_data
-from finding_team_data import get_offensive_data
-from player_stats_data import get_player_data
+from defensive_team_data import get_defensive_week_data
+from finding_team_data import get_offensive_week_data
+from player_stats_data import get_player_week_data
 from make_csv import create_csvs_defense, create_csvs_offense
 
 
-def get_player_input(player_name, offensive_team_name, defensive_team_name, all_data):
+def get_player_input(player_name, offensive_team_name, defensive_team_name, all_data, week):
     
     defensive_team_data1 = create_csvs_defense(all_data, defensive_team_name)
     offensive_team_data1, player_data1 = create_csvs_offense(all_data, player_name, offensive_team_name)
 
-    defensive_stats1 = get_defensive_data(defensive_team_name, defensive_team_data1)
-    offensive_stats1 = get_offensive_data(offensive_team_name, offensive_team_data1)
-    player_stats1 = get_player_data(player_name, offensive_team_name, player_data1, all_data)
+    defensive_stats1 = get_defensive_week_data(defensive_team_name, defensive_team_data1, week)
+    offensive_stats1 = get_offensive_week_data(offensive_team_name, offensive_team_data1, week)
+    player_stats1 = get_player_week_data(player_name, offensive_team_name, player_data1, all_data, week)
 
 
     offensive_stats1 = offensive_stats1.rename(columns={"team_name": "off_team_name"})
@@ -59,7 +59,7 @@ def get_player_input(player_name, offensive_team_name, defensive_team_name, all_
         "recent_volatility", "boom_potential", "bust_risk", "variance_score"
     ]
 
-    with open('../models/fantasy_model.pkl', 'rb') as f:
+    with open('../models/fantasy_model2.pkl', 'rb') as f:
         model_data = pickle.load(f)
         xgb_model = model_data['model']
 
@@ -73,11 +73,11 @@ def get_player_input(player_name, offensive_team_name, defensive_team_name, all_
     return data.iloc[0].to_dict()
 
 
-def create_pair_input(player1, player1_team, player1_defense, player2, player2_team, player2_defense):
+def create_pair_input(player1, player1_team, player1_defense, player2, player2_team, player2_defense, week):
     all_data = pd.read_csv("../data/play_by_play_2025.csv", low_memory=False)
 
-    p1 = get_player_input(player1, player1_team, player1_defense, all_data)
-    p2 = get_player_input(player2, player2_team, player2_defense, all_data)
+    p1 = get_player_input(player1, player1_team, player1_defense, all_data, week,)
+    p2 = get_player_input(player2, player2_team, player2_defense, all_data, week)
     pair = []
 
     pair_features = {

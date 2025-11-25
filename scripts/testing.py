@@ -80,7 +80,7 @@ Week_features = data[feature_cols].replace([np.inf, -np.inf], np.nan).fillna(0)
 Total_features = total_data[feature_cols].replace([np.inf, -np.inf], np.nan).fillna(0)
 
 
-with open('../models/fantasy_model.pkl', 'rb') as f:
+with open('../models/fantasy_model2.pkl', 'rb') as f:
     model_data = pickle.load(f)
     xgb_model = model_data['model']
 
