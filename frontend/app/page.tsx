@@ -22,6 +22,20 @@ export default function Home() {
         {/* Main Content */}
         <main className="flex-1 p-8 text-center">
           <h2 className="text-2xl mb-4">Main Content</h2>
+          <div className="p-8">
+            <input
+              type="text"
+              placeholder="Enter player 1 name"
+              className="border border-gray-300 rounded px-4 py-2 mr-2"
+            />
+          </div>
+          <div className="p-2">
+            <input
+              type="text"
+              placeholder="Enter player 2 name"
+              className="border border-gray-300 rounded px-4 py-2 mr-2"
+            />
+          </div>
           <p>Your content goes here...</p>
           <p>More paragraphs...</p>
         </main>
