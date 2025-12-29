@@ -21,8 +21,8 @@ export default function Home() {
         
         {/* Main Content */}
         <main className="flex-1 p-8 text-center">
-          <h2 className="text-2xl mb-4">Main Content</h2>
-          <div className="p-8">
+          <h2 className="text-2xl mb-8">Main Content</h2>
+          <div className="p-4">
             <input
               type="text"
               placeholder="Enter player 1 name"
@@ -36,8 +36,10 @@ export default function Home() {
               className="border border-gray-300 rounded px-4 py-2 mr-2"
             />
           </div>
-          <p>Your content goes here...</p>
-          <p>More paragraphs...</p>
+          <button className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600">
+            Submit
+          </button>
+          
         </main>
         
         {/* Right Sidebar */}
