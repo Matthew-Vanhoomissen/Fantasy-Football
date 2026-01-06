@@ -1,5 +1,13 @@
+"use client";
+
+import { useState } from "react"
 
 export default function Home() {
+  const text = "Testing Testing";
+  const [player1, setPlayer1] = useState("");
+  const [player2, setPlayer2] = useState("");
+
+  const[testing, setTesting] = useState("")
   return (
     <div className="min-h-screen flex flex-col">
       {/* Top Header/Title */}
@@ -24,6 +32,8 @@ export default function Home() {
           <h2 className="text-2xl mb-8">Main Content</h2>
           <div className="p-4">
             <input
+              value={player1}
+              onChange={(e) => setPlayer1(e.target.value)}
               type="text"
               placeholder="Enter player 1 name"
               className="border border-gray-300 rounded px-4 py-2 mr-2"
@@ -31,14 +41,20 @@ export default function Home() {
           </div>
           <div className="p-2">
             <input
+              value={player2}
               type="text"
+              onChange={(e) => setPlayer2(e.target.value)}
               placeholder="Enter player 2 name"
               className="border border-gray-300 rounded px-4 py-2 mr-2"
             />
           </div>
-          <button className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600">
+          <button className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600"
+            onClick={() => setTesting(player1 + " " + player2)}>
             Submit
           </button>
+          <div className="w-1/2 p-3 mx-auto">
+            <p className="text-xl p-12 border-3 border-black rounded-xl">{testing}</p>
+          </div>
           
         </main>
         
