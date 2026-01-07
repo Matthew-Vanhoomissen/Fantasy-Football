@@ -7,7 +7,18 @@ export default function Home() {
   const [player1, setPlayer1] = useState("");
   const [player2, setPlayer2] = useState("");
 
-  const[testing, setTesting] = useState("")
+  const[testing, setTesting] = useState(null);
+
+  async function submit() {
+    const res = await fetch("http://127.0.0.1:5000", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ player1, player2})
+    });
+
+    const data = await res.json();
+    setTesting(data.message);
+  }
   return (
     <div className="min-h-screen flex flex-col">
       {/* Top Header/Title */}
@@ -49,7 +60,7 @@ export default function Home() {
             />
           </div>
           <button className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600"
-            onClick={() => setTesting(player1 + " " + player2)}>
+            onClick={submit}>
             Submit
           </button>
           <div className="w-1/2 p-3 mx-auto">
