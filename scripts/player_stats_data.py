@@ -1,6 +1,6 @@
 import pandas as pd
-from target_percentage import get_percentage
-from target_percentage import get_week_percentage
+from .target_percentage import get_percentage
+from .target_percentage import get_week_percentage
 
 
 def get_player_data(player_name, team_name, pdp, all_stats): 

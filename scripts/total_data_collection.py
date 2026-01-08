@@ -2,10 +2,10 @@ import pandas as pd
 import numpy as np
 import pickle
 
-from defensive_team_data import get_defensive_week_data
-from finding_team_data import get_offensive_week_data
-from player_stats_data import get_player_week_data
-from make_csv import create_csvs_defense, create_csvs_offense
+from .defensive_team_data import get_defensive_week_data
+from .finding_team_data import get_offensive_week_data
+from .player_stats_data import get_player_week_data
+from .make_csv import create_csvs_defense, create_csvs_offense
 
 
 def get_player_input(player_name, offensive_team_name, defensive_team_name, all_data, week):
@@ -59,7 +59,7 @@ def get_player_input(player_name, offensive_team_name, defensive_team_name, all_
         "recent_volatility", "boom_potential", "bust_risk", "variance_score"
     ]
 
-    with open('../models/fantasy_model2.pkl', 'rb') as f:
+    with open('models/fantasy_model2.pkl', 'rb') as f:
         model_data = pickle.load(f)
         xgb_model = model_data['model']
 
@@ -70,14 +70,21 @@ def get_player_input(player_name, offensive_team_name, defensive_team_name, all_
     
     data['xgb_predicted_points'] = projection
 
-    return data.iloc[0].to_dict()
+    display_cols = [
+        "recent_momentum", "average_fantasy_points", "average_passing_yards", "bust_percent", 
+        "td_rate", "average_recieving_yards", "average_rushing_yards", "boom_percent", 
+        "boom_points_average", "bust_points_average", "epa_per_play"
+    ]
+    display_data = x[display_cols]
+
+    return data.iloc[0].to_dict(), display_data
 
 
 def create_pair_input(player1, player1_team, player1_defense, player2, player2_team, player2_defense, week):
-    all_data = pd.read_csv("../data/play_by_play_2025.csv", low_memory=False)
+    all_data = pd.read_csv("data/play_by_play_2025.csv", low_memory=False)
 
-    p1 = get_player_input(player1, player1_team, player1_defense, all_data, week,)
-    p2 = get_player_input(player2, player2_team, player2_defense, all_data, week)
+    p1, display1 = get_player_input(player1, player1_team, player1_defense, all_data, week)
+    p2, display2 = get_player_input(player2, player2_team, player2_defense, all_data, week)
     pair = []
 
     pair_features = {
@@ -120,5 +127,5 @@ def create_pair_input(player1, player1_team, player1_defense, player2, player2_t
         }
     pair.append(pair_features)
 
-    return pair
+    return pair, display1, display2
     

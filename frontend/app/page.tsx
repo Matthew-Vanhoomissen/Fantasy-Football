@@ -7,7 +7,7 @@ export default function Home() {
   const [player1, setPlayer1] = useState("");
   const [player2, setPlayer2] = useState("");
 
-  const[testing, setTesting] = useState(null);
+  const[testing, setTesting] = useState("");
 
   async function submit() {
     const res = await fetch("http://127.0.0.1:5000", {
@@ -17,7 +17,18 @@ export default function Home() {
     });
 
     const data = await res.json();
-    setTesting(data.message);
+    if(data.status === 'failed' || data.data === null) {
+      setTesting("No player found")
+    }
+    else {
+      if(data.data['recommended_player'] === 1) {
+        setTesting(player1)
+      }
+      else {
+        setTesting(player2)
+      }
+      
+    }
   }
   return (
     <div className="min-h-screen flex flex-col">

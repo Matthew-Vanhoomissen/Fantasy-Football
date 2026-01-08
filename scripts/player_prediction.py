@@ -1,5 +1,5 @@
-from total_data_collection import create_pair_input
-
+from .total_data_collection import create_pair_input
+from .name_formatter import convert
 
 import pandas as pd 
 import torch.nn as nn
@@ -55,7 +55,7 @@ def predict_start_sit(pair_df):
     """
     
     # Load PyTorch model
-    checkpoint = torch.load('../models/start_sit_model.pth', weights_only=False)
+    checkpoint = torch.load('models/start_sit_model.pth', weights_only=False)
     pytorch_model = StartSitModel(checkpoint['input_size'])
     pytorch_model.load_state_dict(checkpoint['model_state_dict'])
     pytorch_model.eval()
@@ -108,17 +108,21 @@ def predict_start_sit(pair_df):
     return result
 
 
-if __name__ == "__main__":
-    p1 = "J.Addison"
-    p1_t = "MIN"
+def final_result(player1_name, player2_name):
+    name_file = pd.read_csv("data/nfl_players.csv", low_memory=False)
+
+    if convert(player1_name, name_file) is None or convert(player2_name, name_file) is None:
+        return None
+
+    p1, p1_t, pos1 = convert(player1_name, name_file)
     p1_d = "DAL"
 
-    p2 = "D.Swift"
-    p2_t = "CHI"
+    p2, p2_t, pos2 = convert(player2_name, name_file)
     p2_d = "CLE"
 
     week = 15
-    pair_data = create_pair_input(p1, p1_t, p1_d, p2, p2_t, p2_d, week)
+    pair_data, display1, display2 = create_pair_input(p1, p1_t, p1_d, p2, p2_t, p2_d, week)
     pair_data = pd.DataFrame(pair_data)
     result = predict_start_sit(pair_data)
     print(result)
+    return result, display1, display2
