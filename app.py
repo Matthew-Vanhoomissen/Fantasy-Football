@@ -16,7 +16,7 @@ CORS(app)
 @app.route("/", methods=["POST"])
 def prediction():
     data = request.json
-    result, display1, display2 = final_result(data['player1'], data['player2'])
+    result, display1, display2, = final_result(data['player1'], data['player2'])
     if result is None:
         return jsonify({"data": None, "display1": None, "display2": None,"status": "failed"})
     return jsonify({"data": result, "display1": display1, "display2": display2, "status": "success"})

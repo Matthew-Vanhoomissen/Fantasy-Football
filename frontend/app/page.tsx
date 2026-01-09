@@ -1,13 +1,30 @@
 "use client";
 
-import { useState } from "react"
+import { use, useState } from "react"
 
 export default function Home() {
   const text = "Testing Testing";
   const [player1, setPlayer1] = useState("");
   const [player2, setPlayer2] = useState("");
 
-  const[testing, setTesting] = useState("");
+  const [testing, setTesting] = useState("");
+
+  const [avgFP1, setAvgFP1] = useState(0)
+  const [momentum1, setMomentum1] = useState(0)
+  const [td1, setTd1] = useState(0)
+  const [position1, setPosition1] = useState("")
+  const [team1, setTeam1] = useState("")
+  const [epa1, setEpa1] = useState(0)
+  const [posStat1, setPosStat1] = useState("")
+
+  const [avgFP2, setAvgFP2] = useState(0)
+  const [momentum2, setMomentum2] = useState(0)
+  const [td2, setTd2] = useState(0)
+  const [position2, setPosition2] = useState("")
+  const [team2, setTeam2] = useState("")
+  const [epa2, setEpa2] = useState(0)
+  const [posStat2, setPosStat2] = useState("")
+
 
   async function submit() {
     const res = await fetch("http://127.0.0.1:5000", {
@@ -21,6 +38,43 @@ export default function Home() {
       setTesting("No player found")
     }
     else {
+      setAvgFP1(data.display1['average_fantasy_points'].toFixed(2))
+      setPosition1(data.display1['position'])
+      console.log(position1)
+      setTd1(data.display1['td_rate'].toFixed(2))
+      setMomentum1(data.display1['recent_momentum'].toFixed(2))
+      if(data.display1['position'] === "QB") {
+        setPosStat1("Average Passing Yards: " + data.display1['average_passing_yards'].toFixed(2))
+      }
+      else if(data.display1['position'] === "RB") {
+        setPosStat1("Average Rushing Yards: " + data.display1['average_rushing_yards'].toFixed(2))
+      }
+      else if(data.display1['position'] === "WR" || data.display1['position'] === "TE") {
+        setPosStat1("Average Recieving Yards: " + data.display1['average_recieving_yards'].toFixed(2))
+      }
+      else {
+        setPosStat1("")
+      }
+      setEpa1(data.display1['epa_per_play'].toFixed(2))
+      //------------------------------------------------------------
+      setAvgFP2(data.display2['average_fantasy_points'].toFixed(2))
+      setPosition2(data.display2['position'])
+      console.log(position2)
+      setTd2(data.display2['td_rate'].toFixed(2))
+      setMomentum2(data.display2['recent_momentum'].toFixed(2))
+      if(data.display2['position'] === "QB") {
+        setPosStat2("Average Passing Yards: " + data.display2['average_passing_yards'].toFixed(2))
+      }
+      else if(data.display2['position'] === "RB") {
+        setPosStat2("Average Rushing Yards: " + data.display2['average_rushing_yards'].toFixed(2))
+      }
+      else if(data.display2['position'] === "WR" || data.display2['position'] === "TE") {
+        setPosStat2("Average Recieving Yards: " + data.display2['average_recieving_yards'].toFixed(2))
+      }
+      else {
+        setPosStat2("")
+      }
+      setEpa2(data.display2['epa_per_play'].toFixed(2))
       if(data.data['recommended_player'] === 1) {
         setTesting(player1)
       }
@@ -41,12 +95,24 @@ export default function Home() {
       <div className="flex flex-1">
         {/* Left Sidebar */}
         <aside className="w-64 bg-gray-100 p-6">
-          <h2 className="text-xl font-semibold mb-4">Menu</h2>
-          <ul className="space-y-2">
-            <li>Link 1</li>
-            <li>Link 2</li>
-            <li>Link 3</li>
-          </ul>
+          <h2 className="text-xl font-semibold mb-4">Player Statistics</h2>
+          <div className="border-3 border-black rounded-xl h-1/3 text-[14px]">
+            <p className="p-2">Player 1: {player1}, {position1}</p>
+            <p className="p-2">Average fantasy points: {avgFP1}</p>
+            <p className="p-2">3 week average: {momentum1}</p>
+            <p className="p-2">Average td/g: {td1}</p>
+            <p className="p-2">Team epa: {epa1}</p>
+            <p className="p-2">{posStat1}</p>
+          </div>
+          <p>---------------------------------------</p>
+          <div className="border-3 border-black rounded-xl h-1/3 text-[14px]">
+            <p className="p-2">Player 2: {player2}, {position2}</p>
+            <p className="p-2">Average fantasy points: {avgFP2}</p>
+            <p className="p-2">3 week average: {momentum2}</p>
+            <p className="p-2">Average td/g: {td2}</p>
+            <p className="p-2">Team epa: {epa2}</p>
+            <p className="p-2">{posStat2}</p>
+          </div>
         </aside>
         
         {/* Main Content */}

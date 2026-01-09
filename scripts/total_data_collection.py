@@ -77,7 +77,7 @@ def get_player_input(player_name, offensive_team_name, defensive_team_name, all_
     ]
     display_data = x[display_cols]
 
-    return data.iloc[0].to_dict(), display_data
+    return data.iloc[0].to_dict(), display_data.iloc[0].to_dict()
 
 
 def create_pair_input(player1, player1_team, player1_defense, player2, player2_team, player2_defense, week):
