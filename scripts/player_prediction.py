@@ -123,7 +123,11 @@ def final_result(player1_name, player2_name):
     week = 15
     pair_data, display1, display2 = create_pair_input(p1, p1_t, p1_d, p2, p2_t, p2_d, week)
     display1['position'] = pos1
+    display1['team'] = p1_t
+
     display2['position'] = pos2
+    display2['team'] = p2_t
+
     pair_data = pd.DataFrame(pair_data)
     result = predict_start_sit(pair_data)
     print(result)

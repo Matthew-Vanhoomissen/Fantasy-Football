@@ -8,6 +8,7 @@ export default function Home() {
   const [player2, setPlayer2] = useState("");
 
   const [testing, setTesting] = useState("");
+  const [confidence, setConfidence] = useState("")
 
   const [avgFP1, setAvgFP1] = useState(0)
   const [momentum1, setMomentum1] = useState(0)
@@ -36,6 +37,7 @@ export default function Home() {
     const data = await res.json();
     if(data.status === 'failed' || data.data === null) {
       setTesting("No player found")
+      setConfidence("")
     }
     else {
       setAvgFP1(data.display1['average_fantasy_points'].toFixed(2))
@@ -56,6 +58,7 @@ export default function Home() {
         setPosStat1("")
       }
       setEpa1(data.display1['epa_per_play'].toFixed(2))
+      setTeam1(data.display1['team'])
       //------------------------------------------------------------
       setAvgFP2(data.display2['average_fantasy_points'].toFixed(2))
       setPosition2(data.display2['position'])
@@ -76,11 +79,13 @@ export default function Home() {
       }
       setEpa2(data.display2['epa_per_play'].toFixed(2))
       if(data.data['recommended_player'] === 1) {
-        setTesting(player1)
+        setTesting("We recommend player " + player1 + ",")
       }
       else {
-        setTesting(player2)
+        setTesting("We recommend player" + player2 + ",")
       }
+      setTeam2(data.display2['team'])
+      setConfidence(" with a confidence " + (data.data['confidence']).toFixed(2) + " percent")
       
     }
   }
@@ -101,7 +106,7 @@ export default function Home() {
             <p className="p-2">Average fantasy points: {avgFP1}</p>
             <p className="p-2">3 week average: {momentum1}</p>
             <p className="p-2">Average td/g: {td1}</p>
-            <p className="p-2">Team epa: {epa1}</p>
+            <p className="p-2">{team1} epa: {epa1}</p>
             <p className="p-2">{posStat1}</p>
           </div>
           <p>---------------------------------------</p>
@@ -110,7 +115,7 @@ export default function Home() {
             <p className="p-2">Average fantasy points: {avgFP2}</p>
             <p className="p-2">3 week average: {momentum2}</p>
             <p className="p-2">Average td/g: {td2}</p>
-            <p className="p-2">Team epa: {epa2}</p>
+            <p className="p-2">{team2} epa: {epa2}</p>
             <p className="p-2">{posStat2}</p>
           </div>
         </aside>
@@ -141,7 +146,11 @@ export default function Home() {
             Submit
           </button>
           <div className="w-1/2 p-3 mx-auto">
-            <p className="text-xl p-12 border-3 border-black rounded-xl">{testing}</p>
+            <p className="text-xl p-12 border-3 border-black rounded-xl">{testing}{confidence}</p>
+          </div>
+          <div className="w-1/2 p-3 mx-auto">
+            <p className="text-l p-5 border-3 border-black rounded-xl bg-cyan-500 text-left">Note: Due to the football season's conclusion, this application's full ability can't be 
+              utilized until the 2026 season starts. Until then feel free to test player stats and model prediction on a week-by-week basis!</p>
           </div>
           
         </main>
