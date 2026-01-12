@@ -17,6 +17,8 @@ def get_player_input(player_name, offensive_team_name, defensive_team_name, all_
     offensive_stats1 = get_offensive_week_data(offensive_team_name, offensive_team_data1, week)
     player_stats1 = get_player_week_data(player_name, offensive_team_name, player_data1, all_data, week)
 
+    if defensive_stats1 is None or offensive_stats1 is None or player_stats1 is None:
+        return None, None
 
     offensive_stats1 = offensive_stats1.rename(columns={"team_name": "off_team_name"})
     defensive_stats1 = defensive_stats1.rename(columns={"team_name": "def_team_name"})
@@ -85,6 +87,9 @@ def create_pair_input(player1, player1_team, player1_defense, player2, player2_t
 
     p1, display1 = get_player_input(player1, player1_team, player1_defense, all_data, week)
     p2, display2 = get_player_input(player2, player2_team, player2_defense, all_data, week)
+
+    if p1 is None or p2 is None:
+        return None, None, None
     pair = []
 
     pair_features = {

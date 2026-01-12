@@ -1,5 +1,6 @@
 from .total_data_collection import create_pair_input
 from .name_formatter import convert
+from .find_opponent import return_opponent
 
 import pandas as pd 
 import torch.nn as nn
@@ -108,20 +109,23 @@ def predict_start_sit(pair_df):
     return result
 
 
-def final_result(player1_name, player2_name):
+def final_result(player1_name, player2_name, week):
     name_file = pd.read_csv("data/nfl_players.csv", low_memory=False)
 
     if convert(player1_name, name_file) is None or convert(player2_name, name_file) is None:
-        return None
+        return None, None, None
 
     p1, p1_t, pos1 = convert(player1_name, name_file)
-    p1_d = "DAL"
+    p1_d = return_opponent(p1_t, week, 2025)
 
     p2, p2_t, pos2 = convert(player2_name, name_file)
-    p2_d = "CLE"
+    p2_d = return_opponent(p2_t, week, 2025)
 
-    week = 15
     pair_data, display1, display2 = create_pair_input(p1, p1_t, p1_d, p2, p2_t, p2_d, week)
+
+    if pair_data is None or display1 is None or display2 is None:
+        return None, None, None
+    
     display1['position'] = pos1
     display1['team'] = p1_t
 

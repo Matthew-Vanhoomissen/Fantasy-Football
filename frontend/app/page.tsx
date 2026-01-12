@@ -26,17 +26,19 @@ export default function Home() {
   const [epa2, setEpa2] = useState(0)
   const [posStat2, setPosStat2] = useState("")
 
+  const [week, setWeek] = useState(4)
+
 
   async function submit() {
     const res = await fetch("http://127.0.0.1:5000", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ player1, player2})
+      body: JSON.stringify({ player1, player2, week})
     });
 
     const data = await res.json();
     if(data.status === 'failed' || data.data === null) {
-      setTesting("No player found")
+      setTesting("No player found or no data for player (injuries this season or has not made an appearance)")
       setConfidence("")
     }
     else {
@@ -123,6 +125,19 @@ export default function Home() {
         {/* Main Content */}
         <main className="flex-1 p-8 text-center">
           <h2 className="text-2xl mb-8">Main Content</h2>
+          <div>
+            <select
+              value={week}
+              onChange={(e) => setWeek(Number(e.target.value))}
+              className="border rounded px-3 py-2"
+            >
+              {Array.from({ length: 15 }, (_, i) => i + 4).map((w) => (
+                <option key={w} value={w}>
+                  Week {w}
+                </option>
+              ))}
+            </select>
+          </div>
           <div className="p-4">
             <input
               value={player1}
