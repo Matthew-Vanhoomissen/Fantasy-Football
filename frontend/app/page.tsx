@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useState } from "react"
+import { use, useEffect, useState } from "react"
 
 export default function Home() {
   const text = "Testing Testing";
@@ -28,6 +28,12 @@ export default function Home() {
 
   const [week, setWeek] = useState(4)
 
+  const positions = ["QB", "WR", "RB", "All"]
+  const [players, setPlayers] = useState(null)
+
+  const [filter, setFilter] = useState("All")
+
+  const[all, setAll] = useState(null)
 
   async function submit() {
     const res = await fetch("http://127.0.0.1:5000", {
@@ -91,6 +97,25 @@ export default function Home() {
       
     }
   }
+  console.log("Starting render")
+  useEffect(() => {
+    fetch('http://127.0.0.1:5000/top-players')
+          .then(response => response.json())
+          .then(data => {
+              if (data.status === 'success') {
+                setPlayers(data.data)
+              } 
+          })
+          .catch(err => {
+              console.log("Err")
+          });
+  }, []);
+
+  if (!players) {
+      return <div>Loading...</div>;
+  }
+  if (!players[filter]) return <div>No data for {filter}</div>;
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Top Header/Title */}
@@ -172,8 +197,25 @@ export default function Home() {
         
         {/* Right Sidebar */}
         <aside className="w-64 bg-gray-100 p-6">
-          <h2 className="text-xl font-semibold mb-4">Info</h2>
-          <p>Additional info here</p>
+          <h2 className="text-xl font-semibold mb-4">Top Players This Season</h2>
+          <select
+            value={filter}
+            onChange={(e) => {
+              setFilter(String(e.target.value))
+            }}
+            className="border rounded px-1 py-.5">
+              {positions.map((pos) => (
+                <option key={pos} value={pos}>{pos}</option>
+              ))}
+          </select>
+          <p>---------------------------------------</p>
+          <div className="border-3 border-black rounded-xl h-2/3 text-[12px]">
+              {players[filter].map((player, index) => (
+                    <div key={player.abbreviation}>
+                        {index + 1}. {player.abbreviation} - {player.team} ({player.position}) - {player.fantasy_points.toFixed(1)} pts
+                    </div>
+                ))}
+          </div>
         </aside>
       </div>
     </div>
