@@ -27,6 +27,17 @@ def get_top_players_by_position(player_data, top_n=20):
     return results
 
 
+def format_players(data):
+    result = []
+    for row in data.itertuples(index=False):
+        result.append({
+            'first_name': row.first_name,
+            'last_name': row.last_name,
+            'team': row.team,
+            'position': row.position
+        })
+    return result
+
 try:
     player_df = pd.read_csv('data/fantasy_points.csv')  
     TOP_PLAYERS_CACHE = get_top_players_by_position(player_df, top_n=20)
@@ -49,6 +60,17 @@ def get_top_players():
     return jsonify({
         "status": "success",
         "data": TOP_PLAYERS_CACHE
+    })
+
+
+@app.route("/players", methods=["GET"])
+def get_players():
+    all_players_df = pd.read_csv('data/offensive_players.csv')
+    result = format_players(all_players_df)
+
+    return jsonify({
+        "status": "success",
+        "data": result
     })
 
 

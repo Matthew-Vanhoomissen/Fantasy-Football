@@ -8,6 +8,10 @@ def get_fantasy_sum(player_name, team, data):
 
     week_only_data = team_data
 
+    two_pt_pass_WN = (week_only_data[week_only_data['passer_player_name'] == player_name]['two_point_conv_result'] == 'success').sum()
+    two_pt_rush_WN = (week_only_data[week_only_data['rusher_player_name'] == player_name]['two_point_conv_result'] == 'success').sum()
+    two_pt_rec_WN = (week_only_data[week_only_data['receiver_player_name'] == player_name]['two_point_conv_result'] == 'success').sum()
+
     total_P_YardsWN = week_only_data[week_only_data['passer_player_name'] == player_name]['passing_yards'].sum()
     total_R_YardsWN = week_only_data[week_only_data['rusher_player_name'] == player_name]['rushing_yards'].sum()
     receiving_yardsWN = week_only_data[week_only_data['receiver_player_name'] == player_name]['receiving_yards'].sum()
@@ -19,7 +23,7 @@ def get_fantasy_sum(player_name, team, data):
     recTdWN = week_only_data[week_only_data['receiver_player_name'] == player_name]['pass_touchdown'].sum()
     
     # Fantasty points from that week
-    total_F_Points_WN = (total_P_YardsWN * .04) + (total_R_YardsWN * .1) + (receiving_yardsWN * .1) - (interceptionsWN * 2) + (pTdWN * 4) + (rtdWN * 6) + (recTdWN * 6) - (fumbles_lostWN * 2) + (receptionsWN)
+    total_F_Points_WN = (total_P_YardsWN * .04) + (total_R_YardsWN * .1) + (receiving_yardsWN * .1) - (interceptionsWN * 2) + (pTdWN * 4) + (rtdWN * 6) + (recTdWN * 6) - (fumbles_lostWN * 2) + (receptionsWN) + (two_pt_rush_WN * 2) + (two_pt_pass_WN * 2) + (two_pt_rec_WN * 2)
 
     return total_F_Points_WN
 
@@ -29,8 +33,7 @@ players = pd.read_csv("../data/offensive_players.csv", low_memory=False)
 
 fantasy_points = []
 new_dataframe = []
-name, l, p = convert("Matthew Stafford", players)
-print(get_fantasy_sum(name, "LAR", all_data))
+
 for row in players.itertuples(index=False):
     if row.position in ["QB", "WR", "RB", "TE", "FB"]:
         result = convert(row.first_name + " " + row.last_name, players)

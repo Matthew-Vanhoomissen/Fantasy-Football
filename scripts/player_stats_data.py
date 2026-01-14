@@ -148,6 +148,7 @@ def get_player_week_data(player_name, team_name, team_data, all_stats, week_inpu
     
     week_only_data = team_data[team_data['week'] == week_input]
 
+    # Week N stats
     total_P_YardsWN = week_only_data[week_only_data['passer_player_name'] == player_name]['passing_yards'].sum()
     total_R_YardsWN = week_only_data[week_only_data['rusher_player_name'] == player_name]['rushing_yards'].sum()
     receiving_yardsWN = week_only_data[week_only_data['receiver_player_name'] == player_name]['receiving_yards'].sum()
@@ -158,54 +159,45 @@ def get_player_week_data(player_name, team_name, team_data, all_stats, week_inpu
     rtdWN = week_only_data[week_only_data['rusher_player_name'] == player_name]['rush_touchdown'].sum()
     recTdWN = week_only_data[week_only_data['receiver_player_name'] == player_name]['pass_touchdown'].sum()
     
-    # Fantasty points from that week
     total_F_Points_WN = (total_P_YardsWN * .04) + (total_R_YardsWN * .1) + (receiving_yardsWN * .1) - (interceptionsWN * 2) + (pTdWN * 4) + (rtdWN * 6) + (recTdWN * 6) - (fumbles_lostWN * 2) + (receptionsWN)
     
+    # Get previous weeks data
     pdp = team_data[team_data['week'] < week_input]
 
-
-    # Make array
-    player_stats = []
-
-    total_P_Yards = pdp[pdp['passer_player_name'] == player_name]['passing_yards'].sum()
-
-    total_R_Yards = pdp[pdp['rusher_player_name'] == player_name]['rushing_yards'].sum()
-
     games_played = pdp['week'].nunique()
-    if games_played == 0:
+    
+    # FIX 1: Need at least 3 previous weeks of data
+    if games_played < 3:
         return None
 
-    average_P_Yards = total_P_Yards/games_played
-    average_R_Yards = total_R_Yards/games_played
+    # Calculate season averages
+    total_P_Yards = pdp[pdp['passer_player_name'] == player_name]['passing_yards'].sum()
+    total_R_Yards = pdp[pdp['rusher_player_name'] == player_name]['rushing_yards'].sum()
+    
+    average_P_Yards = total_P_Yards / games_played
+    average_R_Yards = total_R_Yards / games_played
 
-    receptions = len(pdp[(pdp['receiver_player_name'] == player_name) & (pdp['receiving_yards'] > 0)])
-
+    # FIX 2: Use complete_pass == 1 instead of receiving_yards > 0
+    receptions = len(pdp[(pdp['receiver_player_name'] == player_name) & (pdp['complete_pass'] == 1)])
     receiving_yards = pdp[pdp['receiver_player_name'] == player_name]['receiving_yards'].sum()
-
     average_rec_yards = receiving_yards / games_played
 
     interceptions = pdp[pdp['passer_player_name'] == player_name]['interception'].sum()
-
     fumbles_lost = pdp[pdp['fumbled_1_player_name'] == player_name]['fumble_lost'].sum()
-
     pTd = pdp[pdp['passer_player_name'] == player_name]['pass_touchdown'].sum()
-  
     rtd = pdp[pdp['rusher_player_name'] == player_name]['rush_touchdown'].sum()
-
     recTd = pdp[pdp['receiver_player_name'] == player_name]['pass_touchdown'].sum()
 
     total_F_Points = (total_P_Yards * .04) + (total_R_Yards * .1) + (receiving_yards * .1) - (interceptions * 2) + (pTd * 4) + (rtd * 6) + (recTd * 6) - (fumbles_lost * 2) + (receptions)
     average_F_Points = total_F_Points / games_played
 
-    # fantasy scoring for a single week
     weeks = sorted(pdp['week'].unique())
 
-    # Arrays to store week difference
     positive_difference = []
     negative_difference = []
     boom_games = 0
     bust_games = 0
-    # Goes through each week to find that weeks player data
+    
     for week_num in weeks:
         week_data = pdp[pdp['week'] == week_num]
         
@@ -219,50 +211,37 @@ def get_player_week_data(player_name, team_name, team_data, all_stats, week_inpu
         rtdW = week_data[week_data['rusher_player_name'] == player_name]['rush_touchdown'].sum()
         recTdW = week_data[week_data['receiver_player_name'] == player_name]['pass_touchdown'].sum()
         
-        # Fantasty points from that week
         total_F_Points_W = (total_P_YardsW * .04) + (total_R_YardsW * .1) + (receiving_yardsW * .1) - (interceptionsW * 2) + (pTdW * 4) + (rtdW * 6) + (recTdW * 6) - (fumbles_lostW * 2) + (receptionsW)
         
-        # difference of that week from average
+        # FIX 3: Handle zero average case
         if average_F_Points == 0:
             week_difference = 0
         else:
             week_difference = ((total_F_Points_W - average_F_Points) / average_F_Points)
+        
         week_diff_amount = (total_F_Points_W - average_F_Points)
 
-        # if over or under a threshhold add to array that stores the percentage it went over or under
         if week_diff_amount > 10: 
-            boom_games = boom_games + 1
+            boom_games += 1
             positive_difference.append(week_difference)
         elif week_diff_amount < -10: 
-            bust_games = bust_games + 1
+            bust_games += 1
             negative_difference.append(week_difference)
 
-    # Averages out how much it went over or under for those games
-    pos_total = 0
-    for num in positive_difference: 
-        pos_total = pos_total + num
-
-    pos_average = ((pos_total / len(positive_difference)) * 100) if boom_games else 0
-
-    neg_total = 0
-    for num in negative_difference:
-        neg_total = neg_total + (-num)
-
-    neg_average = ((neg_total / len(negative_difference)) * 100) if bust_games else 0
-
-    # if boom and bust games are not zero, calculate the boom/bust points as the 
-    # multiplication of the average bust/boom percentage and the average fantasy points
-    if boom_games > 0:
+    # FIX 4: Safe calculation with proper checks
+    if boom_games > 0 and len(positive_difference) > 0:
+        pos_average = (sum(positive_difference) / len(positive_difference)) * 100
         boom_points = ((pos_average / 100) + 1) * average_F_Points
-    else: 
+    else:
         boom_points = average_F_Points
 
-    if bust_games > 0:
+    if bust_games > 0 and len(negative_difference) > 0:
+        neg_average = (sum(negative_difference) / len(negative_difference)) * 100
         bust_points = ((neg_average / 100)) * average_F_Points
-    else: 
+    else:
         bust_points = average_F_Points
 
-    # compare with last 3 game average
+    # Last 3 weeks
     last_three_weeks = 0
     weeks_counted = 0
     for week in weeks[-3:]:
@@ -278,16 +257,15 @@ def get_player_week_data(player_name, team_name, team_data, all_stats, week_inpu
         rtdW = week_data[week_data['rusher_player_name'] == player_name]['rush_touchdown'].sum()
         recTdW = week_data[week_data['receiver_player_name'] == player_name]['pass_touchdown'].sum()
         
-        # Fantasty points from that week
         total_F_Points_W = (total_P_YardsW * .04) + (total_R_YardsW * .1) + (receiving_yardsW * .1) - (interceptionsW * 2) + (pTdW * 4) + (rtdW * 6) + (recTdW * 6) - (fumbles_lostW * 2) + (receptionsW)
-        last_three_weeks = last_three_weeks + total_F_Points_W
+        last_three_weeks += total_F_Points_W
         weeks_counted += 1
 
     three_week_average = last_three_weeks / weeks_counted if weeks_counted > 0 else average_F_Points
+    
     percentages = get_week_percentage(team_name, player_name, all_stats, week_input)
 
-    # collect data
-    player_stats.append({
+    player_stats = [{
         'week': week_input,
         'team_name': team_name,
         'player_name': player_name,
@@ -305,7 +283,7 @@ def get_player_week_data(player_name, team_name, team_data, all_stats, week_inpu
         'boom_percent': boom_games / games_played,
         'boom_points_average': boom_points,
         'last_three_weeks_diff': three_week_average - average_F_Points,
-    })
+    }]
 
     player_stats_dataframe = pd.DataFrame(player_stats)
 

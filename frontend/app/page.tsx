@@ -1,6 +1,7 @@
 "use client";
 
 import { use, useEffect, useState } from "react"
+import Select from 'react-select'
 
 export default function Home() {
   const text = "Testing Testing";
@@ -28,12 +29,18 @@ export default function Home() {
 
   const [week, setWeek] = useState(4)
 
-  const positions = ["QB", "WR", "RB", "All"]
+  const positions = ["QB", "WR", "RB", "TE", "All"]
   const [players, setPlayers] = useState(null)
 
   const [filter, setFilter] = useState("All")
 
-  const[all, setAll] = useState(null)
+  const [selectPlayers, setSelectPlayers] = useState([]) 
+
+  const options = [
+    { value: 'chocolate', label: 'Chocolate' },
+    { value: 'strawberry', label: 'Strawberry' },
+    { value: 'vanilla', label: 'Vanilla' }
+  ]
 
   async function submit() {
     const res = await fetch("http://127.0.0.1:5000", {
@@ -90,7 +97,7 @@ export default function Home() {
         setTesting("We recommend player " + player1 + ",")
       }
       else {
-        setTesting("We recommend player" + player2 + ",")
+        setTesting("We recommend player " + player2 + ",")
       }
       setTeam2(data.display2['team'])
       setConfidence(" with a confidence " + (data.data['confidence']).toFixed(2) + " percent")
@@ -108,6 +115,19 @@ export default function Home() {
           })
           .catch(err => {
               console.log("Err")
+          });
+  }, []);
+
+  useEffect(() => {
+    fetch('http://127.0.0.1:5000/players')
+          .then(response => response.json())
+          .then(data => {
+            const option = data.data.map(p => ({
+              value: `${p.first_name} ${p.last_name}`,
+              label: `${p.first_name} ${p.last_name} ${p.position} - ${p.team}`,
+              player: p
+            }));
+            setSelectPlayers(option)
           });
   }, []);
 
@@ -150,7 +170,7 @@ export default function Home() {
         {/* Main Content */}
         <main className="flex-1 p-8 text-center">
           <h2 className="text-2xl mb-8">Main Content</h2>
-          <div>
+          <div>            
             <select
               value={week}
               onChange={(e) => setWeek(Number(e.target.value))}
@@ -163,24 +183,37 @@ export default function Home() {
               ))}
             </select>
           </div>
-          <div className="p-4">
-            <input
-              value={player1}
-              onChange={(e) => setPlayer1(e.target.value)}
-              type="text"
-              placeholder="Enter player 1 name"
-              className="border border-gray-300 rounded px-4 py-2 mr-2"
-            />
-          </div>
-          <div className="p-2">
-            <input
-              value={player2}
-              type="text"
-              onChange={(e) => setPlayer2(e.target.value)}
-              placeholder="Enter player 2 name"
-              className="border border-gray-300 rounded px-4 py-2 mr-2"
-            />
-          </div>
+          <Select options={selectPlayers} 
+                  value={player1.first_name}
+                  onChange={(e) => {
+                    if(e) {
+                      setPlayer1(e.value);
+                    }
+                    else {
+                      setPlayer1('')
+                    }
+                  }}
+                  placeholder="Enter player name"
+                  isSearchable={true}
+                  isClearable={true}
+                  className="w-1/4 mx-auto p-3"
+                />
+
+          <Select options={selectPlayers} 
+                  value={player2.first_name}
+                  onChange={(e) => {
+                    if(e) {
+                      setPlayer2(e.value);
+                    }
+                    else {
+                      setPlayer2('')
+                    }
+                  }}
+                  placeholder="Enter player name"
+                  isSearchable={true}
+                  isClearable={true}
+                  className="w-1/4 mx-auto p-3"
+                />
           <button className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600"
             onClick={submit}>
             Submit

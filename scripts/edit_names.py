@@ -10,6 +10,8 @@ for row in players.itertuples(index=False):
             team_name = "LA"
         elif team_name == "WSH":
             team_name = "WAS"
+        if row.last_name == "Ward":
+            print("Hello")
         new_dataframe.append({
             'first_name': row.first_name,
             'last_name': row.last_name,
