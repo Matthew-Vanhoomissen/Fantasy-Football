@@ -31,7 +31,13 @@ def convert(name, file):
     match = override[override['player_name'] == name]
     if not match.empty:
         abbr = match.iloc[0]['abbreviation']
-        return abbr, player['team'], player['position']
+        player = player.iloc[0]
+        team = player['team']
+        if team == "LAR":
+            team = "LA"
+        elif team == "WSH":
+            team = "WAS"
+        return abbr, team, player['position']
 
     if player.empty:
         return None
@@ -67,6 +73,10 @@ def convert(name, file):
                 chars_needed = max(chars_needed, temp_chars)
             
             abbr = first_name[:chars_needed] + "." + cleaned_last
-        
-        return abbr, player['team'], player['position']
+        team = player['team']
+        if team == "LAR":
+            team = "LA"
+        elif team == "WSH":
+            team = "WAS"
+        return abbr, team, player['position']
     

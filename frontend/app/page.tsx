@@ -51,7 +51,7 @@ export default function Home() {
 
     const data = await res.json();
     if(data.status === 'failed' || data.data === null) {
-      setTesting("No player found or no data for player (injuries this season or has not made an appearance)")
+      setTesting("No player found or no data for player (injuries this season or has not made an appearance) or selected week is players bye week")
       setConfidence("")
     }
     else {
@@ -131,6 +131,22 @@ export default function Home() {
           });
   }, []);
 
+  const selectStyles = {
+    control: (base) => ({
+      ...base,
+      borderColor: '#3b82f6',
+      boxShadow: 'none',
+      '&:hover': {
+        borderColor: '#1e40af'
+      }
+    }),
+    option: (base, state) => ({
+      ...base,
+      backgroundColor: state.isSelected ? '#3b82f6' : state.isFocused ? '#dbeafe' : 'white',
+      color: state.isSelected ? 'white' : '#1e293b',
+    })
+  };
+
   if (!players) {
       return <div>Loading...</div>;
   }
@@ -139,118 +155,219 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Top Header/Title */}
-      <header className="bg-gray-500 text-white p-6 text-center">
-        <h1 className="text-4xl font-bold">Fantasy Football Start/Sit Calculator</h1>
+      <header className="bg-gradient-to-r from-blue-400 to-blue-950 text-white py-8 shadow-lg">
+        <h1 className="text-5xl font-bold text-center tracking-tight">Fantasy Football Start/Sit Calculator</h1>
+        <p className="text-center text-blue-100 mt-2 text-lg">
+          Make smarter start/sit decisions with data-driven insights
+        </p>
       </header>
       
       {/* Main Content Area with Sidebar */}
       <div className="flex flex-1">
         {/* Left Sidebar */}
-        <aside className="w-64 bg-gray-100 p-6">
-          <h2 className="text-xl font-semibold mb-4">Player Statistics</h2>
-          <div className="border-3 border-black rounded-xl h-1/3 text-[14px]">
-            <p className="p-2">Player 1: {player1}, {position1}</p>
-            <p className="p-2">Average fantasy points: {avgFP1}</p>
-            <p className="p-2">3 week average: {momentum1}</p>
-            <p className="p-2">Average td/g: {td1}</p>
-            <p className="p-2">{team1} epa: {epa1}</p>
-            <p className="p-2">{posStat1}</p>
+        <aside className="w-80 bg-white border-r border-gray-200 p-6 shadow-sm">
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-slate-800 mb-1">Player 1</h2>
+            <div className="h-1 w-17 bg-blue-500 rounded"></div>
           </div>
-          <p>---------------------------------------</p>
-          <div className="border-3 border-black rounded-xl h-1/3 text-[14px]">
-            <p className="p-2">Player 2: {player2}, {position2}</p>
-            <p className="p-2">Average fantasy points: {avgFP2}</p>
-            <p className="p-2">3 week average: {momentum2}</p>
-            <p className="p-2">Average td/g: {td2}</p>
-            <p className="p-2">{team2} epa: {epa2}</p>
-            <p className="p-2">{posStat2}</p>
+          <div className="bg-gradient-to-br from-blue-50 to-white border-2 border-blue-200 rounded-xl p-5 space-y-3">
+            {player1 ? (
+              <>
+                <div className="border-b border-blue-100 pb-3">
+                  <p className="text-2xl font-bold text-blue-900">{player1}</p>
+                  <p className="text-sm text-blue-600 font-semibold">{team1} • {position1}</p>
+                </div>
+                
+                <div className="space-y-2 text-sm">
+                  <StatRow label="Avg Fantasy Pts" value={avgFP1} highlight />
+                  <StatRow label="3-Week Momentum" value={momentum1} />
+                  <StatRow label="Avg TD/Game" value={td1} />
+                  <StatRow label="Team EPA" value={epa1} />
+                  {posStat1 && <p className="text-slate-700 bg-blue-50 p-2 rounded">{posStat1}</p>}
+                </div>
+              </>
+            ) : (
+              <p className="text-slate-400 text-center py-8">Select a player to see stats</p>
+            )}
+          </div>
+          <div className="mt-8 mb-6">
+            <h2 className="text-2xl font-bold text-slate-800 mb-1">Player 2</h2>
+            <div className="h-1 w-17 bg-blue-500 rounded"></div>
+          </div>
+          
+          <div className="bg-gradient-to-br from-blue-50 to-white border-2 border-blue-200 rounded-xl p-5 space-y-3">
+            {player2 ? (
+              <>
+                <div className="border-b border-blue-100 pb-3">
+                  <p className="text-2xl font-bold text-blue-900">{player2}</p>
+                  <p className="text-sm text-blue-600 font-semibold">{team2} • {position2}</p>
+                </div>
+                
+                <div className="space-y-2 text-sm">
+                  <StatRow label="Avg Fantasy Pts" value={avgFP2} highlight />
+                  <StatRow label="3-Week Momentum" value={momentum2} />
+                  <StatRow label="Avg TD/Game" value={td2} />
+                  <StatRow label="Team EPA" value={epa2} />
+                  {posStat2 && <p className="text-slate-700 bg-blue-50 p-2 rounded">{posStat2}</p>}
+                </div>
+              </>
+            ) : (
+              <p className="text-slate-400 text-center py-8">Select a player to see stats</p>
+            )}
           </div>
         </aside>
         
         {/* Main Content */}
-        <main className="flex-1 p-8 text-center">
-          <h2 className="text-2xl mb-8">Main Content</h2>
-          <div>            
-            <select
-              value={week}
-              onChange={(e) => setWeek(Number(e.target.value))}
-              className="border rounded px-3 py-2"
-            >
-              {Array.from({ length: 15 }, (_, i) => i + 4).map((w) => (
-                <option key={w} value={w}>
-                  Week {w}
-                </option>
-              ))}
-            </select>
-          </div>
-          <Select options={selectPlayers} 
-                  value={player1.first_name}
-                  onChange={(e) => {
-                    if(e) {
-                      setPlayer1(e.value);
-                    }
-                    else {
-                      setPlayer1('')
-                    }
-                  }}
-                  placeholder="Enter player name"
-                  isSearchable={true}
-                  isClearable={true}
-                  className="w-1/4 mx-auto p-3"
-                />
+        <main className="flex-1 p-8 flex items-center justify-center">
+          
+          <div className="w-2/3">
+            <h2 className="text-3xl font-bold text-slate-800 mb-8 text-center">
+              Compare Players
+            </h2>
+            
+            {/* Week Selector */}
+            <div className="mb-6">
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Select Week
+              </label>
+              <select
+                value={week}
+                onChange={(e) => setWeek(Number(e.target.value))}
+                className="w-full border-2 border-blue-300 rounded-lg px-4 py-3 text-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                {Array.from({ length: 15 }, (_, i) => i + 4).map((w) => (
+                  <option key={w} value={w}>Week {w}</option>
+                ))}
+              </select>
+            </div>
 
-          <Select options={selectPlayers} 
-                  value={player2.first_name}
-                  onChange={(e) => {
-                    if(e) {
-                      setPlayer2(e.value);
-                    }
-                    else {
-                      setPlayer2('')
-                    }
-                  }}
-                  placeholder="Enter player name"
+            {/* Player Selectors */}
+            <div className="space-y-5 mb-8">
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  Player 1
+                </label>
+                <Select 
+                  options={selectPlayers} 
+                  value={selectPlayers.find(p => p.value === player1) || null}
+                  onChange={(e) => setPlayer1(e ? e.value : '')}
+                  placeholder="Search for a player..."
                   isSearchable={true}
                   isClearable={true}
-                  className="w-1/4 mx-auto p-3"
+                  styles={selectStyles}
+                  className="text-lg"
                 />
-          <button className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600"
-            onClick={submit}>
-            Submit
-          </button>
-          <div className="w-1/2 p-3 mx-auto">
-            <p className="text-xl p-12 border-3 border-black rounded-xl">{testing}{confidence}</p>
-          </div>
-          <div className="w-1/2 p-3 mx-auto">
-            <p className="text-l p-5 border-3 border-black rounded-xl bg-cyan-500 text-left">Note: Due to the football season's conclusion, this application's full ability can't be 
-              utilized until the 2026 season starts. Until then feel free to test player stats and model prediction on a week-by-week basis!</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  Player 2
+                </label>
+                <Select 
+                  options={selectPlayers} 
+                  value={selectPlayers.find(p => p.value === player2) || null}
+                  onChange={(e) => setPlayer2(e ? e.value : '')}
+                  placeholder="Search for a player..."
+                  isSearchable={true}
+                  isClearable={true}
+                  styles={selectStyles}
+                  className="text-lg"
+                />
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <button 
+              className="w-full bg-gradient-to-r from-blue-400 to-blue-700 text-white text-xl font-bold py-4 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+              onClick={submit}
+            >
+              Analyze Players
+            </button>
+
+            {/* Results */}
+            {testing && (
+              <div className="mt-8 bg-white border-2 border-blue-300 rounded-xl p-8 shadow-lg">
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-blue-900 mb-2">
+                    {testing}
+                  </p>
+                  <p className="text-xl text-blue-600 font-semibold">
+                    {confidence}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Info Note */}
+            <div className="mt-8 bg-blue-50 border-l-4 border-blue-500 rounded-lg p-6">
+              <p className="text-blue-900 leading-relaxed">
+                <span className="font-bold">Note:</span> Due to the football season's conclusion, 
+                this application's full ability can't be utilized until the 2026 season starts. 
+                Until then feel free to test player stats and model prediction on a week-by-week basis!
+              </p>
+            </div>
           </div>
           
         </main>
         
         {/* Right Sidebar */}
-        <aside className="w-64 bg-gray-100 p-6">
-          <h2 className="text-xl font-semibold mb-4">Top Players This Season</h2>
+        <aside className="w-80 bg-white border-l border-gray-200 p-6 shadow-sm">
+          <div className="mb-4">
+            <h2 className="text-2xl font-bold text-slate-800 mb-1">Top Players 2025</h2>
+            <div className="h-1 w-16 bg-blue-500 rounded"></div>
+          </div>
+
           <select
             value={filter}
-            onChange={(e) => {
-              setFilter(String(e.target.value))
-            }}
-            className="border rounded px-1 py-.5">
-              {positions.map((pos) => (
-                <option key={pos} value={pos}>{pos}</option>
-              ))}
+            onChange={(e) => setFilter(e.target.value)}
+            className="w-full border-2 border-blue-300 rounded-lg px-3 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold"
+          >
+            {positions.map((pos) => (
+              <option key={pos} value={pos}>{pos}</option>
+            ))}
           </select>
-          <p>---------------------------------------</p>
-          <div className="border-3 border-black rounded-xl h-2/3 text-[12px]">
+
+          <div className="bg-slate-50 rounded-xl border border-gray-200 overflow-hidden">
+            <div className="max-h-[calc(100vh-300px)] overflow-y-auto">
               {players[filter].map((player, index) => (
-                    <div key={player.abbreviation}>
-                        {index + 1}. {player.abbreviation} - {player.team} ({player.position}) - {player.fantasy_points.toFixed(1)} pts
+                <div 
+                  key={player.abbreviation}
+                  className={`p-3 border-b border-gray-200 hover:bg-blue-50 transition-colors ${
+                    index < 3 ? 'bg-blue-50' : ''
+                  }`}
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-start gap-2">
+                      <span className={`font-bold ${
+                        index < 3 ? 'text-blue-600 text-lg' : 'text-slate-400'
+                      }`}>
+                        {index + 1}.
+                      </span>
+                      <div>
+                        <p className="font-bold text-slate-800">{player.abbreviation}</p>
+                        <p className="text-xs text-slate-500">{player.team} • {player.position}</p>
+                      </div>
                     </div>
-                ))}
+                    <p className="font-bold text-blue-600 text-sm">
+                      {player.fantasy_points.toFixed(1)}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </aside>
       </div>
+    </div>
+  );
+}
+function StatRow({ label, value, highlight = false }) {
+  return (
+    <div className="flex justify-between items-center">
+      <span className="text-slate-600 font-medium">{label}</span>
+      <span className={`font-bold ${highlight ? 'text-blue-600 text-lg' : 'text-slate-800'}`}>
+        {value}
+      </span>
     </div>
   );
 }

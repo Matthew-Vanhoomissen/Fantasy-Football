@@ -3,8 +3,13 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --primary-blue: #1e40af;      /* Deep blue */
+  --secondary-blue: #3b82f6;    /* Bright blue */
+  --light-blue: #dbeafe;        /* Very light blue */
+  --accent-blue: #60a5fa;       /* Sky blue */
+  --dark-bg: #0f172a;           /* Dark slate */
+  --text-dark: #1e293b;         /* Slate gray */
+  --text-light: #64748b;
 }
 
 @media (prefers-color-scheme: dark) {

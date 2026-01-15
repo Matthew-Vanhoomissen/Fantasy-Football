@@ -116,9 +116,13 @@ def final_result(player1_name, player2_name, week):
         return None, None, None
 
     p1, p1_t, pos1 = convert(player1_name, name_file)
+    print(p1_t)
+    print(p1)
     p1_d = return_opponent(p1_t, week, 2025)
 
     p2, p2_t, pos2 = convert(player2_name, name_file)
+    print(p2_t)
+    print(p2)
     p2_d = return_opponent(p2_t, week, 2025)
 
     pair_data, display1, display2 = create_pair_input(p1, p1_t, p1_d, p2, p2_t, p2_d, week)

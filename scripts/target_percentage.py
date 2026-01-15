@@ -54,7 +54,10 @@ def get_week_percentage(team_name, player_name, pbp, week):
         ]
 
     play_passing_plays = all_passing_plays[all_passing_plays['receiver_player_name'] == player_name]
-    percent = len(play_passing_plays) / len(all_passing_plays)
+    if len(all_passing_plays) == 0:
+        percent = 0
+    else:
+        percent = len(play_passing_plays) / len(all_passing_plays)
 
     # Find carry percentage
     all_rushing_plays = pbp[
@@ -67,7 +70,10 @@ def get_week_percentage(team_name, player_name, pbp, week):
         (pbp['week'] < week)
         ]
     player_rushing_plays = all_rushing_plays[all_rushing_plays['rusher_player_name'] == player_name]
-    percentR = len(player_rushing_plays) / len(all_rushing_plays)
+    if len(all_rushing_plays) == 0:
+        percentR = 0
+    else:
+        percentR = len(player_rushing_plays) / len(all_rushing_plays)
 
     percentage_data.append({
         'week': week,
