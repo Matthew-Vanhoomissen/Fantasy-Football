@@ -2,6 +2,7 @@
 
 import { use, useEffect, useState } from "react"
 import Select from 'react-select'
+import Image from 'next/image'
 
 export default function Home() {
   const text = "Testing Testing";
@@ -27,7 +28,7 @@ export default function Home() {
   const [epa2, setEpa2] = useState(0)
   const [posStat2, setPosStat2] = useState("")
 
-  const [week, setWeek] = useState(4)
+  const [week, setWeek] = useState(18)
 
   const positions = ["QB", "WR", "RB", "TE", "All"]
   const [players, setPlayers] = useState(null)
@@ -35,6 +36,8 @@ export default function Home() {
   const [filter, setFilter] = useState("All")
 
   const [selectPlayers, setSelectPlayers] = useState([]) 
+
+  const [emailCopied, setEmailCopied] = useState(false)
 
   const options = [
     { value: 'chocolate', label: 'Chocolate' },
@@ -145,6 +148,13 @@ export default function Home() {
       backgroundColor: state.isSelected ? '#3b82f6' : state.isFocused ? '#dbeafe' : 'white',
       color: state.isSelected ? 'white' : '#1e293b',
     })
+
+    
+  };
+  const copyEmail = () => {
+    navigator.clipboard.writeText('ma.vanhoom1@gmail.com');
+    setEmailCopied(true);
+    setTimeout(() => setEmailCopied(false), 2000); 
   };
 
   if (!players) {
@@ -155,11 +165,66 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Top Header/Title */}
-      <header className="bg-gradient-to-r from-blue-400 to-blue-950 text-white py-8 shadow-lg">
-        <h1 className="text-5xl font-bold text-center tracking-tight">Fantasy Football Start/Sit Calculator</h1>
-        <p className="text-center text-blue-100 mt-2 text-lg">
-          Make smarter start/sit decisions with data-driven insights
-        </p>
+      <header className="bg-gradient-to-r from-blue-400 to-blue-900 text-white py-8 shadow-lg">
+        <div className="flex items-center justify-between px-8">
+          {/* Left side - Title and subtitle */}
+          <div>
+            <h1 className="text-5xl font-bold tracking-tight">
+              Fantasy Football Start/Sit Calculator
+            </h1>
+            <p className="text-blue-100 mt-2 text-lg">
+              Make smarter start/sit decisions with data-driven insights
+            </p>
+          </div>
+          
+          {/* Right side - Icons in a row */}
+          <div className="flex items-center gap-4">
+            <a
+              href="https://github.com/Matthew-Vanhoomissen" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hover:opacity-80 transition-opacity cursor-pointer"
+            >
+              <Image
+                src="/github.png"
+                alt="Github"
+                width={50}
+                height={50}
+              />
+            </a>
+            <a
+            
+              href="https://www.linkedin.com/in/matthew-vanhoomissen-b9669b325/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hover:opacity-80 transition-opacity cursor-pointer"
+            >
+              <Image
+                src="/linkedin.png"
+                alt="Linkedin"
+                width={50}
+                height={50}
+              />
+            </a>
+            <button
+              onClick={copyEmail}
+              className="hover:opacity-80 transition-opacity cursor-pointer bg-transparent border-none p-0 relative"
+              title="Click to copy email"
+            >
+              <Image
+                src="/email4.webp"
+                alt="Email"
+                width={50}
+                height={50}
+              />
+            </button>
+          </div>
+        </div>
+        {emailCopied && (
+          <div className="absolute top-4 right-8 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg animate-fade-in">
+            ✓ Email copied to clipboard!
+          </div>
+        )}
       </header>
       
       {/* Main Content Area with Sidebar */}
@@ -222,7 +287,7 @@ export default function Home() {
           
           <div className="w-2/3">
             <h2 className="text-3xl font-bold text-slate-800 mb-8 text-center">
-              Compare Players
+              Compare Players (PPR Scoring)
             </h2>
             
             {/* Week Selector */}

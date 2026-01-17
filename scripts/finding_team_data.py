@@ -85,6 +85,7 @@ def get_offensive_week_data(team_name, team_data, week):
         (team_data['week'] < week)
     ]
     if len(offensive_plays) == 0:
+        print("DING DING")
         return None
 
     # average, total, rush, and passing epa

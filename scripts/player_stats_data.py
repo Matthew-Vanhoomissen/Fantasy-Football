@@ -145,28 +145,12 @@ def get_player_data(player_name, team_name, pdp, all_stats):
 
 
 def get_player_week_data(player_name, team_name, team_data, all_stats, week_input): 
-    
-    week_only_data = team_data[team_data['week'] == week_input]
-
-    # Week N stats
-    total_P_YardsWN = week_only_data[week_only_data['passer_player_name'] == player_name]['passing_yards'].sum()
-    total_R_YardsWN = week_only_data[week_only_data['rusher_player_name'] == player_name]['rushing_yards'].sum()
-    receiving_yardsWN = week_only_data[week_only_data['receiver_player_name'] == player_name]['receiving_yards'].sum()
-    receptionsWN = len(week_only_data[(week_only_data['receiver_player_name'] == player_name) & (week_only_data['complete_pass'] == 1)])
-    interceptionsWN = week_only_data[week_only_data['passer_player_name'] == player_name]['interception'].sum()
-    fumbles_lostWN = week_only_data[week_only_data['fumbled_1_player_name'] == player_name]['fumble_lost'].sum()
-    pTdWN = week_only_data[week_only_data['passer_player_name'] == player_name]['pass_touchdown'].sum()
-    rtdWN = week_only_data[week_only_data['rusher_player_name'] == player_name]['rush_touchdown'].sum()
-    recTdWN = week_only_data[week_only_data['receiver_player_name'] == player_name]['pass_touchdown'].sum()
-    
-    total_F_Points_WN = (total_P_YardsWN * .04) + (total_R_YardsWN * .1) + (receiving_yardsWN * .1) - (interceptionsWN * 2) + (pTdWN * 4) + (rtdWN * 6) + (recTdWN * 6) - (fumbles_lostWN * 2) + (receptionsWN)
-    
+        
     # Get previous weeks data
     pdp = team_data[team_data['week'] < week_input]
 
     games_played = pdp['week'].nunique()
     
-    # FIX 1: Need at least 3 previous weeks of data
     if games_played < 3:
         return None
 
@@ -177,7 +161,6 @@ def get_player_week_data(player_name, team_name, team_data, all_stats, week_inpu
     average_P_Yards = total_P_Yards / games_played
     average_R_Yards = total_R_Yards / games_played
 
-    # FIX 2: Use complete_pass == 1 instead of receiving_yards > 0
     receptions = len(pdp[(pdp['receiver_player_name'] == player_name) & (pdp['complete_pass'] == 1)])
     receiving_yards = pdp[pdp['receiver_player_name'] == player_name]['receiving_yards'].sum()
     average_rec_yards = receiving_yards / games_played
@@ -188,7 +171,11 @@ def get_player_week_data(player_name, team_name, team_data, all_stats, week_inpu
     rtd = pdp[pdp['rusher_player_name'] == player_name]['rush_touchdown'].sum()
     recTd = pdp[pdp['receiver_player_name'] == player_name]['pass_touchdown'].sum()
 
-    total_F_Points = (total_P_Yards * .04) + (total_R_Yards * .1) + (receiving_yards * .1) - (interceptions * 2) + (pTd * 4) + (rtd * 6) + (recTd * 6) - (fumbles_lost * 2) + (receptions)
+    two_pt_pass = (pdp[pdp['passer_player_name'] == player_name]['two_point_conv_result'] == 'success').sum()
+    two_pt_rush = (pdp[pdp['rusher_player_name'] == player_name]['two_point_conv_result'] == 'success').sum()
+    two_pt_rec = (pdp[pdp['receiver_player_name'] == player_name]['two_point_conv_result'] == 'success').sum()
+
+    total_F_Points = (total_P_Yards * .04) + (total_R_Yards * .1) + (receiving_yards * .1) - (interceptions * 2) + (pTd * 4) + (rtd * 6) + (recTd * 6) - (fumbles_lost * 2) + (receptions) + (two_pt_pass * 2) + (two_pt_rec * 2) + (two_pt_rush * 2)
     average_F_Points = total_F_Points / games_played
 
     weeks = sorted(pdp['week'].unique())
@@ -211,9 +198,12 @@ def get_player_week_data(player_name, team_name, team_data, all_stats, week_inpu
         rtdW = week_data[week_data['rusher_player_name'] == player_name]['rush_touchdown'].sum()
         recTdW = week_data[week_data['receiver_player_name'] == player_name]['pass_touchdown'].sum()
         
-        total_F_Points_W = (total_P_YardsW * .04) + (total_R_YardsW * .1) + (receiving_yardsW * .1) - (interceptionsW * 2) + (pTdW * 4) + (rtdW * 6) + (recTdW * 6) - (fumbles_lostW * 2) + (receptionsW)
+        two_pt_passW = (week_data[week_data['passer_player_name'] == player_name]['two_point_conv_result'] == 'success').sum()
+        two_pt_rushW = (week_data[week_data['rusher_player_name'] == player_name]['two_point_conv_result'] == 'success').sum()
+        two_pt_recW = (week_data[week_data['receiver_player_name'] == player_name]['two_point_conv_result'] == 'success').sum()
+
+        total_F_Points_W = (total_P_YardsW * .04) + (total_R_YardsW * .1) + (receiving_yardsW * .1) - (interceptionsW * 2) + (pTdW * 4) + (rtdW * 6) + (recTdW * 6) - (fumbles_lostW * 2) + (receptionsW) + (two_pt_passW * 2) + (two_pt_recW * 2) + (two_pt_rushW * 2)
         
-        # FIX 3: Handle zero average case
         if average_F_Points == 0:
             week_difference = 0
         else:
@@ -228,7 +218,6 @@ def get_player_week_data(player_name, team_name, team_data, all_stats, week_inpu
             bust_games += 1
             negative_difference.append(week_difference)
 
-    # FIX 4: Safe calculation with proper checks
     if boom_games > 0 and len(positive_difference) > 0:
         pos_average = (sum(positive_difference) / len(positive_difference)) * 100
         boom_points = ((pos_average / 100) + 1) * average_F_Points
@@ -257,7 +246,11 @@ def get_player_week_data(player_name, team_name, team_data, all_stats, week_inpu
         rtdW = week_data[week_data['rusher_player_name'] == player_name]['rush_touchdown'].sum()
         recTdW = week_data[week_data['receiver_player_name'] == player_name]['pass_touchdown'].sum()
         
-        total_F_Points_W = (total_P_YardsW * .04) + (total_R_YardsW * .1) + (receiving_yardsW * .1) - (interceptionsW * 2) + (pTdW * 4) + (rtdW * 6) + (recTdW * 6) - (fumbles_lostW * 2) + (receptionsW)
+        two_pt_passW = (week_data[week_data['passer_player_name'] == player_name]['two_point_conv_result'] == 'success').sum()
+        two_pt_rushW = (week_data[week_data['rusher_player_name'] == player_name]['two_point_conv_result'] == 'success').sum()
+        two_pt_recW = (week_data[week_data['receiver_player_name'] == player_name]['two_point_conv_result'] == 'success').sum()
+
+        total_F_Points_W = (total_P_YardsW * .04) + (total_R_YardsW * .1) + (receiving_yardsW * .1) - (interceptionsW * 2) + (pTdW * 4) + (rtdW * 6) + (recTdW * 6) - (fumbles_lostW * 2) + (receptionsW) + (two_pt_passW * 2) + (two_pt_recW * 2) + (two_pt_rushW * 2)
         last_three_weeks += total_F_Points_W
         weeks_counted += 1
 
@@ -277,7 +270,7 @@ def get_player_week_data(player_name, team_name, team_data, all_stats, week_inpu
         'rushing_tds_avg': rtd / games_played,
         'recieving_tds_avg': recTd / games_played,
         'average_fantasy_points': total_F_Points / games_played,
-        'week_fantasy_points': total_F_Points_WN,
+        'week_fantasy_points': 0,
         'bust_percent': bust_games / games_played,
         'bust_points_average': bust_points,
         'boom_percent': boom_games / games_played,
