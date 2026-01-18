@@ -12,7 +12,7 @@ import pandas as pd
 app = Flask(__name__)
 CORS(app, origins=[
     "http://localhost:3000",
-    "https://your-app-name.vercel.app"
+    "https://fantasy-football-7w2a.vercel.app"
 ])
 
 
