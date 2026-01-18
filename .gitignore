@@ -1,3 +1,11 @@
 .env
-
 *.csv
+venv/
+__pycache__/
+*.pyc
+.DS_Store
+*.db
+node_modules/
+.next/
+frontend/node_modules/
+frontend/.next/

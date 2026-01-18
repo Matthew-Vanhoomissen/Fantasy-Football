@@ -10,7 +10,10 @@ import pandas as pd
 
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins=[
+    "http://localhost:3000",
+    "https://your-app-name.vercel.app"
+])
 
 
 def get_top_players_by_position(player_data, top_n=20):
@@ -75,4 +78,5 @@ def get_players():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=False)
