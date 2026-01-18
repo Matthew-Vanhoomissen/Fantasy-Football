@@ -137,7 +137,7 @@ export default function Home() {
   }, []);
 
   const selectStyles = {
-    control: (base) => ({
+    control: (base: any) => ({
       ...base,
       borderColor: '#3b82f6',
       boxShadow: 'none',
@@ -145,7 +145,7 @@ export default function Home() {
         borderColor: '#1e40af'
       }
     }),
-    option: (base, state) => ({
+    option: (base: any, state: any) => ({
       ...base,
       backgroundColor: state.isSelected ? '#3b82f6' : state.isFocused ? '#dbeafe' : 'white',
       color: state.isSelected ? 'white' : '#1e293b',
@@ -316,8 +316,8 @@ export default function Home() {
                 </label>
                 <Select 
                   options={selectPlayers} 
-                  value={selectPlayers.find(p => p.value === player1) || null}
-                  onChange={(e) => setPlayer1(e ? e.value : '')}
+                  value={selectPlayers.find((p: any) => p.value === player1) || null}
+                  onChange={(e: any) => setPlayer1(e ? e.value : '')}
                   placeholder="Search for a player..."
                   isSearchable={true}
                   isClearable={true}
@@ -332,8 +332,8 @@ export default function Home() {
                 </label>
                 <Select 
                   options={selectPlayers} 
-                  value={selectPlayers.find(p => p.value === player2) || null}
-                  onChange={(e) => setPlayer2(e ? e.value : '')}
+                  value={selectPlayers.find((p: any) => p.value === player2) || null}
+                  onChange={(e: any) => setPlayer2(e ? e.value : '')}
                   placeholder="Search for a player..."
                   isSearchable={true}
                   isClearable={true}
@@ -396,7 +396,7 @@ export default function Home() {
 
           <div className="bg-slate-50 rounded-xl border border-gray-200 overflow-hidden">
             <div className="max-h-[calc(100vh-300px)] overflow-y-auto">
-              {players[filter].map((player, index) => (
+              {(players[filter] as any[]).map((player: any, index: any) => (
                 <div 
                   key={player.abbreviation}
                   className={`p-3 border-b border-gray-200 hover:bg-blue-50 transition-colors ${
@@ -428,7 +428,7 @@ export default function Home() {
     </div>
   );
 }
-function StatRow({ label, value, highlight = false }) {
+function StatRow({ label, value, highlight = false }: any) {
   return (
     <div className="flex justify-between items-center">
       <span className="text-slate-600 font-medium">{label}</span>
