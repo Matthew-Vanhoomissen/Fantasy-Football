@@ -54,7 +54,12 @@ export default function Home() {
 
     const data = await res.json();
     if(data.status === 'failed' || data.data === null) {
-      setTesting("No player found or no data for player (injuries this season or has not made an appearance) or selected week is players bye week")
+      if(data.reason === "NPF") {
+        setTesting("No player found. Check spelling and capitalization")
+      }
+      else if(data.reason === "NDF") {
+        setTesting("No data found for selected player (injuries this season or has not made an appearance). Player may be on bye week")
+      }
       setConfidence("")
     }
     else {

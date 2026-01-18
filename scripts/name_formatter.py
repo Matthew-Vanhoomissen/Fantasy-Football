@@ -9,6 +9,9 @@ def convert(name, file):
 
 
     full_name = name.split(" ", 1)
+    if len(full_name) != 2:
+        return None
+    
     last_name = full_name[1]
     first_name = full_name[0]
     first_initial = first_name[0]

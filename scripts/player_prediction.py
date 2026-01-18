@@ -113,7 +113,7 @@ def final_result(player1_name, player2_name, week):
     name_file = pd.read_csv("data/nfl_players.csv", low_memory=False)
 
     if convert(player1_name, name_file) is None or convert(player2_name, name_file) is None:
-        return None, None, None
+        return None, None, None, "NPF"
 
     p1, p1_t, pos1 = convert(player1_name, name_file)
     print(p1_t)
@@ -128,7 +128,7 @@ def final_result(player1_name, player2_name, week):
     pair_data, display1, display2 = create_pair_input(p1, p1_t, p1_d, p2, p2_t, p2_d, week)
 
     if pair_data is None or display1 is None or display2 is None:
-        return None, None, None
+        return None, None, None, "NDF"
     
     display1['position'] = pos1
     display1['team'] = p1_t
@@ -139,4 +139,4 @@ def final_result(player1_name, player2_name, week):
     pair_data = pd.DataFrame(pair_data)
     result = predict_start_sit(pair_data)
     print(result)
-    return result, display1, display2,
+    return result, display1, display2, ""
