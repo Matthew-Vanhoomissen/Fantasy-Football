@@ -39,14 +39,10 @@ export default function Home() {
 
   const [emailCopied, setEmailCopied] = useState(false)
 
-  const options = [
-    { value: 'chocolate', label: 'Chocolate' },
-    { value: 'strawberry', label: 'Strawberry' },
-    { value: 'vanilla', label: 'Vanilla' }
-  ]
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
   async function submit() {
-    const res = await fetch("http://127.0.0.1:5000", {
+    const res = await fetch(`${API_URL}/`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ player1, player2, week})
@@ -114,7 +110,7 @@ export default function Home() {
   }
   console.log("Starting render")
   useEffect(() => {
-    fetch('http://127.0.0.1:5000/top-players')
+    fetch(`${API_URL}/top-players`)
           .then(response => response.json())
           .then(data => {
               if (data.status === 'success') {
@@ -127,7 +123,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    fetch('http://127.0.0.1:5000/players')
+    fetch(`${API_URL}/players`)
           .then(response => response.json())
           .then(data => {
             const option = data.data.map(p => ({
