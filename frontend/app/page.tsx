@@ -122,11 +122,12 @@ export default function Home() {
           });
   }, []);
 
+  
   useEffect(() => {
     fetch(`${API_URL}/players`)
           .then(response => response.json())
           .then(data => {
-            const option = data.data.map(p => ({
+            const option = data.data.map((p: any) => ({
               value: `${p.first_name} ${p.last_name}`,
               label: `${p.first_name} ${p.last_name} ${p.position} - ${p.team}`,
               player: p
