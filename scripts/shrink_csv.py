@@ -27,6 +27,7 @@ NEEDED_COLUMNS = [
     'interception',
     'fumble_lost',
     'pass_touchdown',
+    'rush_touchdown',
     'two_point_conv_result',
     'epa',
     'td_team',
@@ -34,7 +35,9 @@ NEEDED_COLUMNS = [
     'field_goal_result',
     'extra_point_result',
     'penalty_team',
-    'penalty_yards'
+    'penalty_yards',
+    'home_team',
+    'away_team'
 ]
 
 all_data = pd.read_csv("../data/play_by_play_2025.csv", low_memory=False, dtype={'week': 'int8', 'season': 'int16'}, usecols=NEEDED_COLUMNS)
