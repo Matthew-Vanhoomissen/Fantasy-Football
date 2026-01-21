@@ -82,8 +82,7 @@ def get_player_input(player_name, offensive_team_name, defensive_team_name, all_
     return data.iloc[0].to_dict(), display_data.iloc[0].to_dict()
 
 
-def create_pair_input(player1, player1_team, player1_defense, player2, player2_team, player2_defense, week):
-    all_data = pd.read_csv("data/play_by_play_2025.csv", low_memory=False)
+def create_pair_input(player1, player1_team, player1_defense, player2, player2_team, player2_defense, week, all_data):
 
     p1, display1 = get_player_input(player1, player1_team, player1_defense, all_data, week)
     p2, display2 = get_player_input(player2, player2_team, player2_defense, all_data, week)

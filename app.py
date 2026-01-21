@@ -15,6 +15,8 @@ CORS(app, origins=[
     "https://fantasy-football-7w2a.vercel.app"
 ])
 
+name_file = pd.read_csv("data/nfl_players.csv", low_memory=False)
+all_data = pd.read_csv("data/play_by_play_2025.csv", low_memory=False)
 
 def get_top_players_by_position(player_data, top_n=20):
     sorted_data = player_data.sort_values('fantasy_points', ascending=False)
@@ -52,7 +54,7 @@ except Exception as e:
 @app.route("/", methods=["POST"])
 def prediction():
     data = request.json
-    result, display1, display2, reason = final_result(data['player1'], data['player2'], data['week'])
+    result, display1, display2, reason = final_result(data['player1'], data['player2'], data['week'], name_file, all_data)
     if result is None or display1 is None or display2 is None:
         return jsonify({"data": None, "display1": None, "display2": None,"status": "failed", "reason": reason})
     return jsonify({"data": result, "display1": display1, "display2": display2, "status": "success", "reason": None})
