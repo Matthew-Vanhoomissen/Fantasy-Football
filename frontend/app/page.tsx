@@ -5,7 +5,6 @@ import Select from 'react-select'
 import Image from 'next/image'
 
 export default function Home() {
-  const text = "Testing Testing";
   const [player1, setPlayer1] = useState("");
   const [player2, setPlayer2] = useState("");
 
@@ -61,7 +60,6 @@ export default function Home() {
     else {
       setAvgFP1(data.display1['average_fantasy_points'].toFixed(2))
       setPosition1(data.display1['position'])
-      console.log(position1)
       setTd1(data.display1['td_rate'].toFixed(2))
       setMomentum1(data.display1['recent_momentum'].toFixed(2))
       if(data.display1['position'] === "QB") {
@@ -78,10 +76,9 @@ export default function Home() {
       }
       setEpa1(data.display1['epa_per_play'].toFixed(2))
       setTeam1(data.display1['team'])
-      //------------------------------------------------------------
+      
       setAvgFP2(data.display2['average_fantasy_points'].toFixed(2))
       setPosition2(data.display2['position'])
-      console.log(position2)
       setTd2(data.display2['td_rate'].toFixed(2))
       setMomentum2(data.display2['recent_momentum'].toFixed(2))
       if(data.display2['position'] === "QB") {
@@ -105,10 +102,9 @@ export default function Home() {
       }
       setTeam2(data.display2['team'])
       setConfidence(" with a confidence " + (data.data['confidence']).toFixed(2) + " percent")
-      
     }
   }
-  console.log("Starting render")
+
   useEffect(() => {
     fetch(`${API_URL}/top-players`)
           .then(response => response.json())
@@ -122,7 +118,6 @@ export default function Home() {
           });
   }, []);
 
-  
   useEffect(() => {
     fetch(`${API_URL}/players`)
           .then(response => response.json())
@@ -150,9 +145,8 @@ export default function Home() {
       backgroundColor: state.isSelected ? '#3b82f6' : state.isFocused ? '#dbeafe' : 'white',
       color: state.isSelected ? 'white' : '#1e293b',
     })
-
-    
   };
+
   const copyEmail = () => {
     navigator.clipboard.writeText('ma.vanhoom1@gmail.com');
     setEmailCopied(true);
@@ -160,27 +154,28 @@ export default function Home() {
   };
 
   if (!players) {
-      return <div>Loading...</div>;
+      return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
-  if (!players[filter]) return <div>No data for {filter}</div>;
+  if (!players[filter]) return <div className="min-h-screen flex items-center justify-center">No data for {filter}</div>;
 
   return (
     <div className="min-h-screen flex flex-col">
       {/* Top Header/Title */}
-      <header className="bg-gradient-to-r from-blue-400 to-blue-900 text-white py-8 shadow-lg">
-        <div className="flex items-center justify-between px-8">
+      <header className="bg-gradient-to-r from-blue-400 to-blue-900 text-white py-4 md:py-8 shadow-lg relative">
+        <div className="flex flex-col md:flex-row items-center justify-between px-4 md:px-8 gap-4">
           {/* Left side - Title and subtitle */}
-          <div>
-            <h1 className="text-5xl font-bold tracking-tight">
+          <div className="text-center md:text-left">
+            <h1 className="text-2xl md:text-5xl font-bold tracking-tight">
               Fantasy Football Start/Sit Calculator
             </h1>
-            <p className="text-blue-100 mt-2 text-lg">
+            <p className="text-blue-100 mt-1 md:mt-2 text-sm md:text-lg">
               Make smarter start/sit decisions with data-driven insights
             </p>
           </div>
           
           {/* Right side - Icons in a row */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 md:gap-4">
+            
             <a
               href="https://github.com/Matthew-Vanhoomissen" 
               target="_blank" 
@@ -190,12 +185,12 @@ export default function Home() {
               <Image
                 src="/github.png"
                 alt="Github"
-                width={50}
-                height={50}
+                width={40}
+                height={40}
+                className="md:w-[50px] md:h-[50px]"
               />
             </a>
             <a
-            
               href="https://www.linkedin.com/in/matthew-vanhoomissen-b9669b325/" 
               target="_blank" 
               rel="noopener noreferrer"
@@ -204,8 +199,9 @@ export default function Home() {
               <Image
                 src="/linkedin.png"
                 alt="Linkedin"
-                width={50}
-                height={50}
+                width={40}
+                height={40}
+                className="md:w-[50px] md:h-[50px]"
               />
             </a>
             <button
@@ -216,91 +212,92 @@ export default function Home() {
               <Image
                 src="/email4.webp"
                 alt="Email"
-                width={50}
-                height={50}
+                width={40}
+                height={40}
+                className="md:w-[50px] md:h-[50px]"
               />
             </button>
           </div>
         </div>
         {emailCopied && (
-          <div className="absolute top-4 right-8 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg animate-fade-in">
-            ✓ Email copied to clipboard!
+          <div className="absolute top-4 right-4 md:right-8 bg-green-500 text-white px-3 md:px-4 py-2 rounded-lg shadow-lg animate-fade-in text-sm md:text-base">
+            ✓ Email copied!
           </div>
         )}
       </header>
       
-      {/* Main Content Area with Sidebar */}
-      <div className="flex flex-1">
-        {/* Left Sidebar */}
-        <aside className="w-80 bg-white border-r border-gray-200 p-6 shadow-sm">
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold text-slate-800 mb-1">Player 1</h2>
-            <div className="h-1 w-17 bg-blue-500 rounded"></div>
+      {/* Main Content Area - Stack on mobile, side-by-side on desktop */}
+      <div className="flex flex-col lg:flex-row flex-1">
+        {/* Left Sidebar - Full width on mobile, sidebar on desktop */}
+        <aside className="w-full lg:w-80 bg-white border-b lg:border-r lg:border-b-0 border-gray-200 p-4 md:p-6 shadow-sm">
+          <div className="mb-4 md:mb-6">
+            <h2 className="text-xl md:text-2xl font-bold text-slate-800 mb-1">Player 1</h2>
+            <div className="h-1 w-16 md:w-17 bg-blue-500 rounded"></div>
           </div>
-          <div className="bg-gradient-to-br from-blue-50 to-white border-2 border-blue-200 rounded-xl p-5 space-y-3">
+          <div className="bg-gradient-to-br from-blue-50 to-white border-2 border-blue-200 rounded-xl p-4 md:p-5 space-y-2 md:space-y-3">
             {player1 ? (
               <>
-                <div className="border-b border-blue-100 pb-3">
-                  <p className="text-2xl font-bold text-blue-900">{player1}</p>
-                  <p className="text-sm text-blue-600 font-semibold">{team1} • {position1}</p>
+                <div className="border-b border-blue-100 pb-2 md:pb-3">
+                  <p className="text-xl md:text-2xl font-bold text-blue-900">{player1}</p>
+                  <p className="text-xs md:text-sm text-blue-600 font-semibold">{team1} • {position1}</p>
                 </div>
                 
-                <div className="space-y-2 text-sm">
+                <div className="space-y-1 md:space-y-2 text-xs md:text-sm">
                   <StatRow label="Avg Fantasy Pts" value={avgFP1} highlight />
                   <StatRow label="3-Week Momentum" value={momentum1} />
                   <StatRow label="Avg TD/Game" value={td1} />
                   <StatRow label="Team EPA" value={epa1} />
-                  {posStat1 && <p className="text-slate-700 bg-blue-50 p-2 rounded">{posStat1}</p>}
+                  {posStat1 && <p className="text-slate-700 bg-blue-50 p-2 rounded text-xs md:text-sm">{posStat1}</p>}
                 </div>
               </>
             ) : (
-              <p className="text-slate-400 text-center py-8">Select a player to see stats</p>
+              <p className="text-slate-400 text-center py-6 md:py-8 text-sm md:text-base">Select a player to see stats</p>
             )}
           </div>
-          <div className="mt-8 mb-6">
-            <h2 className="text-2xl font-bold text-slate-800 mb-1">Player 2</h2>
-            <div className="h-1 w-17 bg-blue-500 rounded"></div>
+          
+          <div className="mt-6 md:mt-8 mb-4 md:mb-6">
+            <h2 className="text-xl md:text-2xl font-bold text-slate-800 mb-1">Player 2</h2>
+            <div className="h-1 w-16 md:w-17 bg-blue-500 rounded"></div>
           </div>
           
-          <div className="bg-gradient-to-br from-blue-50 to-white border-2 border-blue-200 rounded-xl p-5 space-y-3">
+          <div className="bg-gradient-to-br from-blue-50 to-white border-2 border-blue-200 rounded-xl p-4 md:p-5 space-y-2 md:space-y-3">
             {player2 ? (
               <>
-                <div className="border-b border-blue-100 pb-3">
-                  <p className="text-2xl font-bold text-blue-900">{player2}</p>
-                  <p className="text-sm text-blue-600 font-semibold">{team2} • {position2}</p>
+                <div className="border-b border-blue-100 pb-2 md:pb-3">
+                  <p className="text-xl md:text-2xl font-bold text-blue-900">{player2}</p>
+                  <p className="text-xs md:text-sm text-blue-600 font-semibold">{team2} • {position2}</p>
                 </div>
                 
-                <div className="space-y-2 text-sm">
+                <div className="space-y-1 md:space-y-2 text-xs md:text-sm">
                   <StatRow label="Avg Fantasy Pts" value={avgFP2} highlight />
                   <StatRow label="3-Week Momentum" value={momentum2} />
                   <StatRow label="Avg TD/Game" value={td2} />
                   <StatRow label="Team EPA" value={epa2} />
-                  {posStat2 && <p className="text-slate-700 bg-blue-50 p-2 rounded">{posStat2}</p>}
+                  {posStat2 && <p className="text-slate-700 bg-blue-50 p-2 rounded text-xs md:text-sm">{posStat2}</p>}
                 </div>
               </>
             ) : (
-              <p className="text-slate-400 text-center py-8">Select a player to see stats</p>
+              <p className="text-slate-400 text-center py-6 md:py-8 text-sm md:text-base">Select a player to see stats</p>
             )}
           </div>
         </aside>
         
-        {/* Main Content */}
-        <main className="flex-1 p-8 flex items-center justify-center">
-          
-          <div className="w-2/3">
-            <h2 className="text-3xl font-bold text-slate-800 mb-8 text-center">
+        {/* Main Content - Full width on mobile, centered on desktop */}
+        <main className="flex-1 p-4 md:p-8 flex items-center justify-center">
+          <div className="w-full lg:w-2/3 max-w-4xl">
+            <h2 className="text-2xl md:text-3xl font-bold text-slate-800 mb-6 md:mb-8 text-center">
               Compare Players (PPR Scoring)
             </h2>
             
             {/* Week Selector */}
-            <div className="mb-6">
-              <label className="block text-sm font-semibold text-slate-700 mb-2">
+            <div className="mb-4 md:mb-6">
+              <label className="block text-xs md:text-sm font-semibold text-slate-700 mb-2">
                 Select Week
               </label>
               <select
                 value={week}
                 onChange={(e) => setWeek(Number(e.target.value))}
-                className="w-full border-2 border-blue-300 rounded-lg px-4 py-3 text-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full border-2 border-blue-300 rounded-lg px-3 md:px-4 py-2 md:py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 {Array.from({ length: 15 }, (_, i) => i + 4).map((w) => (
                   <option key={w} value={w}>Week {w}</option>
@@ -309,9 +306,9 @@ export default function Home() {
             </div>
 
             {/* Player Selectors */}
-            <div className="space-y-5 mb-8">
+            <div className="space-y-4 md:space-y-5 mb-6 md:mb-8">
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                <label className="block text-xs md:text-sm font-semibold text-slate-700 mb-2">
                   Player 1
                 </label>
                 <Select 
@@ -322,12 +319,12 @@ export default function Home() {
                   isSearchable={true}
                   isClearable={true}
                   styles={selectStyles}
-                  className="text-lg"
+                  className="text-sm md:text-lg"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                <label className="block text-xs md:text-sm font-semibold text-slate-700 mb-2">
                   Player 2
                 </label>
                 <Select 
@@ -338,14 +335,14 @@ export default function Home() {
                   isSearchable={true}
                   isClearable={true}
                   styles={selectStyles}
-                  className="text-lg"
+                  className="text-sm md:text-lg"
                 />
               </div>
             </div>
 
             {/* Submit Button */}
             <button 
-              className="w-full bg-gradient-to-r from-blue-400 to-blue-700 text-white text-xl font-bold py-4 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+              className="w-full bg-gradient-to-r from-blue-400 to-blue-700 text-white text-lg md:text-xl font-bold py-3 md:py-4 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
               onClick={submit}
             >
               Analyze Players
@@ -353,12 +350,12 @@ export default function Home() {
 
             {/* Results */}
             {testing && (
-              <div className="mt-8 bg-white border-2 border-blue-300 rounded-xl p-8 shadow-lg">
+              <div className="mt-6 md:mt-8 bg-white border-2 border-blue-300 rounded-xl p-6 md:p-8 shadow-lg">
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-blue-900 mb-2">
+                  <p className="text-xl md:text-2xl font-bold text-blue-900 mb-2">
                     {testing}
                   </p>
-                  <p className="text-xl text-blue-600 font-semibold">
+                  <p className="text-lg md:text-xl text-blue-600 font-semibold">
                     {confidence}
                   </p>
                 </div>
@@ -366,28 +363,27 @@ export default function Home() {
             )}
 
             {/* Info Note */}
-            <div className="mt-8 bg-blue-50 border-l-4 border-blue-500 rounded-lg p-6">
-              <p className="text-blue-900 leading-relaxed">
+            <div className="mt-6 md:mt-8 bg-blue-50 border-l-4 border-blue-500 rounded-lg p-4 md:p-6">
+              <p className="text-blue-900 leading-relaxed text-sm md:text-base">
                 <span className="font-bold">Note:</span> Due to the football season's conclusion, 
                 this application's full ability can't be utilized until the 2026 season starts. 
                 Until then feel free to test player stats and model prediction on a week-by-week basis!
               </p>
             </div>
           </div>
-          
         </main>
         
-        {/* Right Sidebar */}
-        <aside className="w-80 bg-white border-l border-gray-200 p-6 shadow-sm">
-          <div className="mb-4">
-            <h2 className="text-2xl font-bold text-slate-800 mb-1">Top Players 2025</h2>
-            <div className="h-1 w-16 bg-blue-500 rounded"></div>
+        {/* Right Sidebar - Full width on mobile, sidebar on desktop */}
+        <aside className="w-full lg:w-80 bg-white border-t lg:border-l lg:border-t-0 border-gray-200 p-4 md:p-6 shadow-sm">
+          <div className="mb-3 md:mb-4">
+            <h2 className="text-xl md:text-2xl font-bold text-slate-800 mb-1">Top Players 2025</h2>
+            <div className="h-1 w-14 md:w-16 bg-blue-500 rounded"></div>
           </div>
 
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
-            className="w-full border-2 border-blue-300 rounded-lg px-3 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold"
+            className="w-full border-2 border-blue-300 rounded-lg px-3 py-2 mb-3 md:mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm md:text-base"
           >
             {positions.map((pos) => (
               <option key={pos} value={pos}>{pos}</option>
@@ -395,27 +391,27 @@ export default function Home() {
           </select>
 
           <div className="bg-slate-50 rounded-xl border border-gray-200 overflow-hidden">
-            <div className="max-h-[calc(100vh-300px)] overflow-y-auto">
+            <div className="max-h-96 lg:max-h-[calc(100vh-300px)] overflow-y-auto">
               {(players[filter] as any[]).map((player: any, index: any) => (
                 <div 
                   key={player.abbreviation}
-                  className={`p-3 border-b border-gray-200 hover:bg-blue-50 transition-colors ${
+                  className={`p-2 md:p-3 border-b border-gray-200 hover:bg-blue-50 transition-colors ${
                     index < 3 ? 'bg-blue-50' : ''
                   }`}
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex items-start gap-2">
-                      <span className={`font-bold ${
-                        index < 3 ? 'text-blue-600 text-lg' : 'text-slate-400'
+                      <span className={`font-bold text-sm md:text-base ${
+                        index < 3 ? 'text-blue-600 md:text-lg' : 'text-slate-400'
                       }`}>
                         {index + 1}.
                       </span>
                       <div>
-                        <p className="font-bold text-slate-800">{player.abbreviation}</p>
+                        <p className="font-bold text-slate-800 text-sm md:text-base">{player.abbreviation}</p>
                         <p className="text-xs text-slate-500">{player.team} • {player.position}</p>
                       </div>
                     </div>
-                    <p className="font-bold text-blue-600 text-sm">
+                    <p className="font-bold text-blue-600 text-xs md:text-sm">
                       {player.fantasy_points.toFixed(1)}
                     </p>
                   </div>
@@ -428,11 +424,12 @@ export default function Home() {
     </div>
   );
 }
+
 function StatRow({ label, value, highlight = false }: any) {
   return (
     <div className="flex justify-between items-center">
       <span className="text-slate-600 font-medium">{label}</span>
-      <span className={`font-bold ${highlight ? 'text-blue-600 text-lg' : 'text-slate-800'}`}>
+      <span className={`font-bold ${highlight ? 'text-blue-600 text-base md:text-lg' : 'text-slate-800'}`}>
         {value}
       </span>
     </div>
