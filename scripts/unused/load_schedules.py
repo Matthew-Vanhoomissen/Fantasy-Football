@@ -5,7 +5,6 @@ import os
 season = 2025
 DATA_DIR = "../data"
 
-# Correct URL for nflverse schedules
 url = "https://github.com/nflverse/nfldata/raw/master/data/games.csv"
 
 print("Downloading NFL schedules from nflverse...")
@@ -13,10 +12,10 @@ print("Downloading NFL schedules from nflverse...")
 
 try:
     schedules = pd.read_csv(url, low_memory=False)
-    print(f"✅ Downloaded {len(schedules)} total games")
+    print(f"Downloaded {len(schedules)} total games")
     print(f"Seasons available: {sorted(schedules['season'].unique())}")
 except Exception as e:
-    print("❌ Error downloading schedules.")
+    print("Error downloading schedules.")
     print("Error details:", e)
     exit()
 

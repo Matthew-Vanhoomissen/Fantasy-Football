@@ -31,7 +31,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 print(f"Training samples: {len(X_train)}, Test samples: {len(X_test)}")
 
-# Convert numpy arrays to PyTorch tensors (required for PyTorch)
+# Convert numpy arrays to PyTorch tensors 
 X_train_tensor = torch.FloatTensor(X_train)
 y_train_tensor = torch.FloatTensor(y_train).unsqueeze(1)  # unsqueeze adds dimension for batch processing
 X_test_tensor = torch.FloatTensor(X_test)
@@ -174,5 +174,5 @@ for epoch in range(epochs):
     if (epoch + 1) % 5 == 0:
         print(f'Epoch [{epoch+1}/{epochs}], Loss: {train_loss/len(train_loader):.4f}, Accuracy: {accuracy:.2f}%, Best: {best_accuracy:.2f}%')
 
-print(f'\n✅ Best Accuracy: {best_accuracy:.2f}%')
+print(f'\nBest Accuracy: {best_accuracy:.2f}%')
 print('Model saved to ../models/start_sit_model.pth')

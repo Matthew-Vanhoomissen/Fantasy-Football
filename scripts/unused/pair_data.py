@@ -6,7 +6,6 @@ data = pd.read_csv("../data/training_dataset_with_predictions.csv", low_memory=F
 
 pairs = []
 
-# Group by week
 for week in data['week'].unique():
     week_data = data[data['week'] == week]
     
@@ -80,10 +79,6 @@ for week in data['week'].unique():
         pairs.append(pair_features)
 
 pairs_df = pd.DataFrame(pairs)
-
-# Optional: Balance the dataset if heavily skewed
-# target_counts = pairs_df['target'].value_counts()
-# print(f"Class distribution: {target_counts.to_dict()}")
 
 pairs_df.to_csv("../data/player_pairs_dataset.csv", index=False)
 print(f"✅ Created {len(pairs_df)} player comparison pairs")

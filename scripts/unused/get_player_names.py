@@ -12,8 +12,8 @@ if not API_KEY:
 
 BASE_URL = "https://api.balldontlie.io/nfl/v1/players"
 OUTPUT_FILE = "../data/nfl_players.csv"
-REQUEST_DELAY = 12.5  # 5 RPM
-SAVE_INTERVAL = 10  # Save every 10 pages
+REQUEST_DELAY = 12.5  
+SAVE_INTERVAL = 10  
 
 headers = {"Authorization": API_KEY}
 
@@ -60,7 +60,6 @@ while True:
     page += 1
     print(f"Page {page}: total valid players: {len(players_data)}")
 
-    # Save periodically
     if page % SAVE_INTERVAL == 0:
         save_players(players_data, OUTPUT_FILE)
 

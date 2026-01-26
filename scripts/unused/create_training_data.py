@@ -50,8 +50,8 @@ for player_name in players:
         # Merge all three into one row
         final3 = (
             player_stats3
-            .merge(offensive_stats3, on=["off_team_name", "week"], how="left")  # offense joins by same team + week
-            .merge(defensive_stats3, left_on=["def_team_name", "week"], right_on=["def_team_name", "week"], how="left")  # defense joins by defense team + week
+            .merge(offensive_stats3, on=["off_team_name", "week"], how="left")  
+            .merge(defensive_stats3, left_on=["def_team_name", "week"], right_on=["def_team_name", "week"], how="left")  
         )
 
         all_player_data.append(final3)
