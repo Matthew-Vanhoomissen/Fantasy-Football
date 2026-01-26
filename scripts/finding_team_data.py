@@ -2,7 +2,6 @@ import pandas as pd
 
 
 def get_offensive_data(team_name, team_data): 
-    # Make empty array
     offensive_stats = []
 
     # all offensive plays
@@ -63,7 +62,6 @@ def get_offensive_data(team_name, team_data):
         
     })
 
-    # Return array
     return pd.DataFrame(offensive_stats)
 
 
@@ -135,5 +133,4 @@ def get_offensive_week_data(team_name, team_data, week):
         
     })
 
-    # Return array
     return pd.DataFrame(offensive_stats)

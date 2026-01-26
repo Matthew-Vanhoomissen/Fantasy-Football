@@ -2,7 +2,6 @@ import pandas as pd
 
 
 def get_percentage(team_name, player_name, pbp):
-    # Make array
     percentage_data = []
 
     # Find target share percentage
@@ -39,7 +38,6 @@ def get_percentage(team_name, player_name, pbp):
 
 
 def get_week_percentage(team_name, player_name, pbp, week):
-    # Make array
     percentage_data = []
 
     # Find target share percentage

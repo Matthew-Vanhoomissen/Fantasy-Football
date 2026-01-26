@@ -116,7 +116,7 @@ def create_pair_input(player1, player1_team, player1_defense, player2, player2_t
             'p2_boom_potential': p2['boom_potential'],
             'p2_bust_risk': p2['bust_risk'],
             
-            # Differential features (most important for decision)
+            # Differential features 
             'pred_diff': p1['xgb_predicted_points'] - p2['xgb_predicted_points'],
             'avg_diff': p1['average_fantasy_points'] - p2['average_fantasy_points'],
             'momentum_diff': p1['recent_momentum'] - p2['recent_momentum'],

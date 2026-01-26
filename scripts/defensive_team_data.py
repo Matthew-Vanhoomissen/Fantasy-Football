@@ -2,7 +2,6 @@ import pandas as pd
 
 
 def get_defensive_data(team_nameI, team_data): 
-    # Make empty array
     defensive_stats = []
 
     team_name = team_nameI

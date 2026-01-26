@@ -17,10 +17,8 @@ except Exception as e:
     print("Error details:", e)
     exit()
 
-# confirm data folder exists
 os.makedirs("../data", exist_ok=True)
 
-# Save to file
 output_path = f"../data/play_by_play_{season}.csv"
 pbp.to_csv(output_path, index=False)
 print(f"Data saved to {output_path}")
