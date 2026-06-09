@@ -1,6 +1,42 @@
-
-
 import pandas as pd
+
+
+def create_csvs_offense(pbp, player_name, offensive_team_name):
+
+    # filter the dataframe
+    offensive_team_data = pbp[(pbp['home_team'] == offensive_team_name) | (pbp['away_team'] == offensive_team_name)]
+
+    # filter for player
+    player_data = pbp[
+        (pbp['passer_player_name'] == player_name) |
+        (pbp['rusher_player_name'] == player_name) |
+        (pbp['receiver_player_name'] == player_name)
+    ]
+
+    return offensive_team_data, player_data
+
+
+def create_csvs_defense(pbp, defense_team_name):
+
+    # filter for defense
+    defensive_team_data = pbp[(pbp['home_team'] == defense_team_name) | (pbp['away_team'] == defense_team_name)]
+
+    return defensive_team_data
+
+
+def return_opponent(team, week, season):
+    schedule = pd.read_csv(f"data/schedule_{season}.csv")
+
+    schedule = schedule[schedule["week"] == week]
+
+    away = schedule[schedule['away_team'] == team]
+    if not away.empty:
+        return (away.iloc[0])['home_team']
+    home = schedule[schedule['home_team'] == team]
+    if not home.empty:
+        return (home.iloc[0])['away_team']
+
+    return None
 
 
 def convert(name, file):

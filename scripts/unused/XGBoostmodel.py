@@ -8,6 +8,7 @@ import os
 
 data = pd.read_csv("../data/training_dataset.csv", low_memory=False)
 
+
 # === Feature Engineering ===
 data['bust_adjusted_avg'] = data['average_fantasy_points'] * (1 - data['bust_percent'])
 data['recent_momentum'] = data['average_fantasy_points'] + data['last_three_weeks_diff']

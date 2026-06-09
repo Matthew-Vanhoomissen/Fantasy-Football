@@ -5,7 +5,7 @@ import pickle
 from .defensive_team_data import get_defensive_week_data
 from .finding_team_data import get_offensive_week_data
 from .player_stats_data import get_player_week_data
-from .make_csv import create_csvs_defense, create_csvs_offense
+from .collection_methods import create_csvs_defense, create_csvs_offense
 
 
 def get_player_input(player_name, offensive_team_name, defensive_team_name, all_data, week):

@@ -1,12 +1,12 @@
 import pandas as pd 
 
-from finding_team_data import get_offensive_week_data
-from player_stats_data import get_player_week_data
-from player_stats_data import get_player_team
-from player_stats_data import get_opponent_team
-from defensive_team_data import get_defensive_week_data
-from make_csv import create_csvs_offense
-from make_csv import create_csvs_defense
+from scripts.input_collection.finding_team_data import get_offensive_week_data
+from scripts.input_collection.player_stats_data import get_player_week_data
+from scripts.input_collection.player_stats_data import get_player_team
+from scripts.input_collection.player_stats_data import get_opponent_team
+from scripts.input_collection.defensive_team_data import get_defensive_week_data
+from scripts.input_collection.collection_methods import create_csvs_offense
+from scripts.input_collection.collection_methods import create_csvs_defense
 
 all_data = pd.read_csv("../data/play_by_play_2025.csv", low_memory=False)
 

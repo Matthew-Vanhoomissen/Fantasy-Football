@@ -1,6 +1,6 @@
-from .total_data_collection import create_pair_input
-from .name_formatter import convert
-from .find_opponent import return_opponent
+from ..input_collection.total_data_collection import create_pair_input
+from ..input_collection.collection_methods import convert
+from ..input_collection.collection_methods import return_opponent
 
 import pandas as pd 
 import torch.nn as nn
@@ -55,7 +55,6 @@ def predict_start_sit(pair_df):
         Dictionary with recommendation and confidence
     """
     
-    # Load PyTorch model
     checkpoint = torch.load('models/start_sit_model.pth', weights_only=False)
     pytorch_model = StartSitModel(checkpoint['input_size'])
     pytorch_model.load_state_dict(checkpoint['model_state_dict'])

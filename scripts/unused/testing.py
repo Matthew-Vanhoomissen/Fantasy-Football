@@ -1,9 +1,9 @@
-from player_stats_data import get_player_week_data, get_player_data
-from defensive_team_data import get_defensive_week_data
-from finding_team_data import get_offensive_week_data
+from scripts.input_collection.player_stats_data import get_player_week_data, get_player_data
+from scripts.input_collection.defensive_team_data import get_defensive_week_data
+from scripts.input_collection.finding_team_data import get_offensive_week_data
 
-from make_csv import create_csvs_offense, create_csvs_defense
-from total_data_collection import get_player_input
+from scripts.input_collection.collection_methods import create_csvs_offense, create_csvs_defense
+from scripts.input_collection.total_data_collection import get_player_input
 
 import pandas as pd
 import numpy as np
