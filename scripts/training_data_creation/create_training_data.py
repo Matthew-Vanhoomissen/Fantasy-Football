@@ -4,6 +4,7 @@ from scripts.input_collection.finding_team_data import get_offensive_week_data
 from scripts.input_collection.player_stats_data import get_player_week_data
 from scripts.input_collection.player_stats_data import get_player_team
 from scripts.input_collection.player_stats_data import get_opponent_team
+from scripts.input_collection.player_stats_data import did_player_play_this_week
 from scripts.input_collection.defensive_team_data import get_defensive_week_data
 from scripts.input_collection.collection_methods import create_csvs_offense
 from scripts.input_collection.collection_methods import create_csvs_defense
@@ -26,14 +27,13 @@ for player_name in players:
         week = num
 
         print(week)
+
+        if not did_player_play_this_week(offensive_team_data, player_name, week):
+            print(f"Player did not participate this week {week}")
+            continue
+
         defensive_team_name = get_opponent_team(all_data, offensive_team_name, week) # Get team name and data
         defensive_team_data = create_csvs_defense(all_data, defensive_team_name)
-
-        # If player has not played or is invalid, skip
-        offensive_stats = get_offensive_week_data(offensive_team_name, offensive_team_data, week)
-        if offensive_stats is None:
-            print(f"No data for week {week}")
-            continue
 
         # If error in reading defensive data, skip
         defensive_stats = get_defensive_week_data(defensive_team_name, defensive_team_data, week)
@@ -41,10 +41,16 @@ for player_name in players:
             print(f"No defensive stats for week {week}")
             continue
 
+        # If player has not played or is invalid, skip
+        offensive_stats = get_offensive_week_data(offensive_team_name, offensive_team_data, week)
+        if offensive_stats is None:
+            print(f"No data for week {week}")
+            continue
+
         # If error in reading player data, skip
         player_stats = get_player_week_data(player_name, offensive_team_name, player_data, all_data, week)
         if player_stats is None:
-            print(f"Player did not participate this week {week}")
+            print(f"No player stats for week {week}")
             continue
 
         # Ensure dataframes have differing column names

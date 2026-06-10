@@ -145,7 +145,37 @@ def get_player_data(player_name, team_name, pdp, all_stats):
 
 
 def get_player_week_data(player_name, team_name, team_data, all_stats, week_input): 
-        
+    # === Current Week Fantasy Points (target variable) ===
+    current_week_data = team_data[team_data['week'] == week_input]
+
+    cw_passing_yards = current_week_data[current_week_data['passer_player_name'] == player_name]['passing_yards'].sum()
+    cw_rushing_yards = current_week_data[current_week_data['rusher_player_name'] == player_name]['rushing_yards'].sum()
+    cw_receiving_yards = current_week_data[current_week_data['receiver_player_name'] == player_name]['receiving_yards'].sum()
+    cw_receptions = len(current_week_data[(current_week_data['receiver_player_name'] == player_name) & (current_week_data['complete_pass'] == 1)])
+    cw_interceptions = current_week_data[current_week_data['passer_player_name'] == player_name]['interception'].sum()
+    cw_fumbles_lost = current_week_data[current_week_data['fumbled_1_player_name'] == player_name]['fumble_lost'].sum()
+    cw_pass_td = current_week_data[current_week_data['passer_player_name'] == player_name]['pass_touchdown'].sum()
+    cw_rush_td = current_week_data[current_week_data['rusher_player_name'] == player_name]['rush_touchdown'].sum()
+    cw_rec_td = current_week_data[current_week_data['receiver_player_name'] == player_name]['pass_touchdown'].sum()
+    cw_two_pt_pass = (current_week_data[current_week_data['passer_player_name'] == player_name]['two_point_conv_result'] == 'success').sum()
+    cw_two_pt_rush = (current_week_data[current_week_data['rusher_player_name'] == player_name]['two_point_conv_result'] == 'success').sum()
+    cw_two_pt_rec = (current_week_data[current_week_data['receiver_player_name'] == player_name]['two_point_conv_result'] == 'success').sum()
+
+    week_fantasy_points = (
+        (cw_passing_yards * 0.04) +
+        (cw_rushing_yards * 0.1) +
+        (cw_receiving_yards * 0.1) -
+        (cw_interceptions * 2) +
+        (cw_pass_td * 4) +
+        (cw_rush_td * 6) +
+        (cw_rec_td * 6) -
+        (cw_fumbles_lost * 2) +
+        (cw_receptions) +
+        (cw_two_pt_pass * 2) +
+        (cw_two_pt_rec * 2) +
+        (cw_two_pt_rush * 2)
+    )
+
     # Get previous weeks data
     pdp = team_data[team_data['week'] < week_input]
 
@@ -175,7 +205,20 @@ def get_player_week_data(player_name, team_name, team_data, all_stats, week_inpu
     two_pt_rush = (pdp[pdp['rusher_player_name'] == player_name]['two_point_conv_result'] == 'success').sum()
     two_pt_rec = (pdp[pdp['receiver_player_name'] == player_name]['two_point_conv_result'] == 'success').sum()
 
-    total_F_Points = (total_P_Yards * .04) + (total_R_Yards * .1) + (receiving_yards * .1) - (interceptions * 2) + (pTd * 4) + (rtd * 6) + (recTd * 6) - (fumbles_lost * 2) + (receptions) + (two_pt_pass * 2) + (two_pt_rec * 2) + (two_pt_rush * 2)
+    total_F_Points = (
+        (total_P_Yards * .04) +
+        (total_R_Yards * .1) +
+        (receiving_yards * .1) -
+        (interceptions * 2) +
+        (pTd * 4) +
+        (rtd * 6) +
+        (recTd * 6) -
+        (fumbles_lost * 2) +
+        (receptions) +
+        (two_pt_pass * 2) +
+        (two_pt_rec * 2) +
+        (two_pt_rush * 2)
+    )
     average_F_Points = total_F_Points / games_played
 
     weeks = sorted(pdp['week'].unique())
@@ -229,7 +272,6 @@ def get_player_week_data(player_name, team_name, team_data, all_stats, week_inpu
     if bust_games > 0 and len(negative_difference) > 0:
         neg_average = (sum(negative_difference) / len(negative_difference)) * 100
         bust_points = (((neg_average / 100)) * average_F_Points) + average_F_Points
-        print(bust_points)
     else:
         bust_points = average_F_Points
 
@@ -273,7 +315,7 @@ def get_player_week_data(player_name, team_name, team_data, all_stats, week_inpu
         'rushing_tds_avg': rtd / games_played,
         'recieving_tds_avg': recTd / games_played,
         'average_fantasy_points': total_F_Points / games_played,
-        'week_fantasy_points': 0,
+        'week_fantasy_points': week_fantasy_points,
         'bust_percent': bust_games / games_played,
         'bust_points_average': bust_points,
         'boom_percent': boom_games / games_played,
@@ -311,3 +353,17 @@ def get_opponent_team(all_data, offensive_team_name, week):
     opponent_team = week_data['defteam'].mode()[0] if len(week_data) > 0 else None
     
     return opponent_team
+
+
+def did_player_play_this_week(team_data, player_name, week):
+    week_data = team_data[team_data['week'] == week]
+    
+    # Check if player actually has any plays recorded this week
+    played = (
+        week_data[week_data['passer_player_name'] == player_name]['passing_yards'].sum() > 0 or
+        week_data[week_data['rusher_player_name'] == player_name]['rushing_yards'].sum() > 0 or
+        week_data[week_data['receiver_player_name'] == player_name]['receiving_yards'].sum() > 0 or
+        len(week_data[week_data['receiver_player_name'] == player_name]) > 0
+    )
+
+    return played
