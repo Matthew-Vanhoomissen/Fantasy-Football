@@ -5,7 +5,7 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 from flask import jsonify, request, Flask
 from flask_cors import CORS
-from scripts.player_prediction import final_result
+from scripts.model_prediction.player_prediction import final_result
 import pandas as pd
 
 

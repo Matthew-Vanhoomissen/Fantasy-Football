@@ -204,17 +204,19 @@ def get_player_week_data(player_name, team_name, team_data, all_stats, week_inpu
 
         total_F_Points_W = (total_P_YardsW * .04) + (total_R_YardsW * .1) + (receiving_yardsW * .1) - (interceptionsW * 2) + (pTdW * 4) + (rtdW * 6) + (recTdW * 6) - (fumbles_lostW * 2) + (receptionsW) + (two_pt_passW * 2) + (two_pt_recW * 2) + (two_pt_rushW * 2)
         
+        # Week difference is the percentage of the week points compared to average
         if average_F_Points == 0:
             week_difference = 0
         else:
             week_difference = ((total_F_Points_W - average_F_Points) / average_F_Points)
         
+        # Numerical difference between week points and the average
         week_diff_amount = (total_F_Points_W - average_F_Points)
 
-        if week_diff_amount > 10: 
+        if week_diff_amount > 6:
             boom_games += 1
             positive_difference.append(week_difference)
-        elif week_diff_amount < -10: 
+        elif week_diff_amount < -6:
             bust_games += 1
             negative_difference.append(week_difference)
 
@@ -226,7 +228,8 @@ def get_player_week_data(player_name, team_name, team_data, all_stats, week_inpu
 
     if bust_games > 0 and len(negative_difference) > 0:
         neg_average = (sum(negative_difference) / len(negative_difference)) * 100
-        bust_points = ((neg_average / 100)) * average_F_Points
+        bust_points = (((neg_average / 100)) * average_F_Points) + average_F_Points
+        print(bust_points)
     else:
         bust_points = average_F_Points
 

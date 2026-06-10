@@ -33,20 +33,20 @@ def get_player_input(player_name, offensive_team_name, defensive_team_name, all_
     )
 
     # === Feature Engineering ===
-    data['bust_adjusted_avg'] = data['average_fantasy_points'] * (1 - data['bust_percent'])
-    data['recent_momentum'] = data['average_fantasy_points'] + data['last_three_weeks_diff']
-    data['boom_weighted_avg'] = data['average_fantasy_points'] * (1 + data['boom_percent'])
-    data['total_usage'] = data['passing_target_percentage'] + data['rushing_percentage']
-    data['boom_bust_ratio'] = data['boom_percent'] / (data['bust_percent'] + 0.01)
-    data['td_rate'] = (data['passing_tds_avg'] + data['rushing_tds_avg'] + data['recieving_tds_avg'])
-    data['matchup_advantage'] = data['epa_per_play'] - data['avg_epa_against']
-    data['offensive_efficiency'] = data['epa_per_play'] * data['total_usage']
+    # data['bust_adjusted_avg'] = data['average_fantasy_points'] * (1 - data['bust_percent'])
+    # data['recent_momentum'] = data['average_fantasy_points'] + data['last_three_weeks_diff']
+    # data['boom_weighted_avg'] = data['average_fantasy_points'] * (1 + data['boom_percent'])
+    # data['total_usage'] = data['passing_target_percentage'] + data['rushing_percentage']
+    # data['boom_bust_ratio'] = data['boom_percent'] / (data['bust_percent'] + 0.01)
+    # data['td_rate'] = (data['passing_tds_avg'] + data['rushing_tds_avg'] + data['recieving_tds_avg'])
+    # data['matchup_advantage'] = data['epa_per_play'] - data['avg_epa_against']
+    # data['offensive_efficiency'] = data['epa_per_play'] * data['total_usage']
 
-    # Add variance-capturing features
-    data['recent_volatility'] = abs(data['last_three_weeks_diff'])
-    data['boom_potential'] = data['boom_points_average'] - data['average_fantasy_points']
-    data['bust_risk'] = data['average_fantasy_points'] - data['bust_points_average']
-    data['variance_score'] = (data['boom_percent'] + data['bust_percent']) * data['average_fantasy_points']
+    # # Add variance-capturing features
+    # data['recent_volatility'] = abs(data['last_three_weeks_diff'])
+    # data['boom_potential'] = data['boom_points_average'] - data['average_fantasy_points']
+    # data['bust_risk'] = data['average_fantasy_points'] - data['bust_points_average']
+    # data['variance_score'] = (data['boom_percent'] + data['bust_percent']) * data['average_fantasy_points']
 
     feature_cols = [
         "bust_adjusted_avg", "recent_momentum", "boom_weighted_avg",
