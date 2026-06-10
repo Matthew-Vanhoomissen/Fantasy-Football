@@ -8,9 +8,9 @@ from scripts.input_collection.defensive_team_data import get_defensive_week_data
 from scripts.input_collection.collection_methods import create_csvs_offense
 from scripts.input_collection.collection_methods import create_csvs_defense
 
-all_data = pd.read_csv("../../data/play_by_play_2025.csv", low_memory=False)
+all_data = pd.read_csv("data/play_by_play/play_by_play_2025.csv", low_memory=False)
 
-players = pd.read_csv("../../data/players.csv", header=None, skiprows=1, low_memory=False)[0].dropna().unique().tolist()
+players = pd.read_csv("data/player_names/players_2025.csv", header=None, skiprows=1, low_memory=False)[0].dropna().unique().tolist()
 
 all_player_data = []
 
@@ -65,11 +65,13 @@ for player_name in players:
 
 # Add all entries together
 season_data = pd.concat(all_player_data, ignore_index=True)
+# final_data = pd.DataFrame(season_data)
+# final_data.to_csv("data/training_dataset/training_dataset_2024.csv", index=False)
 
 # Load other seasons to add together
-season_2024 = pd.read_csv("../../data/training_dataset_2024.csv", low_memory=False)
-season_2023 = pd.read_csv("../../data/training_dataset_2023.csv", low_memory=False)
-season_2022 = pd.read_csv("../../data/training_dataset_2022.csv", low_memory=False)
+season_2024 = pd.read_csv("data/training_dataset/training_dataset_2024.csv", low_memory=False)
+season_2023 = pd.read_csv("data/training_dataset/training_dataset_2023.csv", low_memory=False)
+season_2022 = pd.read_csv("data/training_dataset/training_dataset_2022.csv", low_memory=False)
 
 # Add season label
 season_data['season'] = 2025
@@ -78,4 +80,4 @@ season_2023['season'] = 2023
 season_2022['season'] = 2022
 
 final_data = pd.concat([season_2022, season_2023, season_2024, season_data], ignore_index=True)
-final_data.to_csv("../../data/training_dataset.csv", index=False)
+final_data.to_csv("data/training_dataset/training_dataset.csv", index=False)

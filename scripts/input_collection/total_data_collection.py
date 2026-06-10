@@ -9,7 +9,7 @@ from .collection_methods import create_csvs_defense, create_csvs_offense
 
 
 def get_player_input(player_name, offensive_team_name, defensive_team_name, all_data, week):
-    
+   
     defensive_team_data1 = create_csvs_defense(all_data, defensive_team_name)
     offensive_team_data1, player_data1 = create_csvs_offense(all_data, player_name, offensive_team_name)
 
@@ -17,6 +17,8 @@ def get_player_input(player_name, offensive_team_name, defensive_team_name, all_
     offensive_stats1 = get_offensive_week_data(offensive_team_name, offensive_team_data1, week)
     player_stats1 = get_player_week_data(player_name, offensive_team_name, player_data1, all_data, week)
 
+    # TODO This will return null during biweek because it can't find opponent. Make another method
+    #      that can be used by the frontend
     if defensive_stats1 is None or offensive_stats1 is None or player_stats1 is None:
         return None, None
 
@@ -48,6 +50,7 @@ def get_player_input(player_name, offensive_team_name, defensive_team_name, all_
     # data['bust_risk'] = data['average_fantasy_points'] - data['bust_points_average']
     # data['variance_score'] = (data['boom_percent'] + data['bust_percent']) * data['average_fantasy_points']
 
+    # TODO Doesn't utilize epa per rush/pass. Trim down to just inputs from stats, then build from there
     feature_cols = [
         "bust_adjusted_avg", "recent_momentum", "boom_weighted_avg",
         "average_fantasy_points", "passing_target_percentage", "total_usage",
