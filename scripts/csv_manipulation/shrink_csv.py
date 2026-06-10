@@ -40,6 +40,6 @@ NEEDED_COLUMNS = [
     'away_team'
 ]
 
-all_data = pd.read_csv("../data/play_by_play_2025.csv", low_memory=False, dtype={'week': 'int8', 'season': 'int16'}, usecols=NEEDED_COLUMNS)
+all_data = pd.read_csv("../../data/play_by_play_2022.csv", low_memory=False, dtype={'week': 'int8', 'season': 'int16'}, usecols=NEEDED_COLUMNS)
 
-all_data.to_csv("../data/play_by_play_2025.csv", index=False)
+all_data.to_csv("../../data/play_by_play_2022.csv", index=False)
