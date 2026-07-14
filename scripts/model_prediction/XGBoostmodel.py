@@ -21,7 +21,7 @@ feature_cols = [
     "epa_per_rush", "epa_per_pass", "pass_percent", "rush_percent",
     "allowed_passing_yards", "allowed_rushing_yards", "sack_yards",
     "pass_epa_against", "rush_epa_against", "points_against",
-    "position", "redzone_carries", "redzone_targets"
+    "position"
 ]
 
 # Residual target — what we're now predicting

@@ -141,6 +141,16 @@ def get_defensive_week_data(team_nameI, team_data, week):
 
     points_allowed = ((touchdowns_allowed * 6) + (field_goals_allowed * 3) + extra_points_allowed + (two_point_conversions * 2)) / games_played
 
+        # Third and Fourth down conversion rate
+    all_third_downs = len(team_data[team_data['down'] == 3.0])
+    all_fourth_downs = len(team_data[team_data['down'] == 4.0])
+
+    converted_third_downs = len(team_data[team_data['third_down_converted'] == 1.0])
+    converted_fourth_downs = len(team_data[team_data['fourth_down_converted'] == 1.0])
+
+    third_down_completion = converted_third_downs / all_third_downs
+    fourth_down_completion = converted_fourth_downs / all_fourth_downs
+
     defensive_stats.append({
         'week': week,
         'team_name': team_name,
@@ -150,7 +160,9 @@ def get_defensive_week_data(team_nameI, team_data, week):
         'avg_epa_against': epa_per_play,
         'pass_epa_against': pass_epa_play,
         'rush_epa_against': rush_epa_play,
-        'points_against': points_allowed
+        'points_against': points_allowed,
+        'third_down_completion': third_down_completion,
+        'fourth_down_completion': fourth_down_completion
         
     })
 

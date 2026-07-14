@@ -23,5 +23,4 @@ def get_season_data(season):
     print(f"Data saved to {output_path}")
 
 
-for i in range(2, 6):
-    get_season_data(i)
+get_season_data(2020)

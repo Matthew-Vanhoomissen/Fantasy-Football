@@ -122,6 +122,17 @@ def get_offensive_week_data(team_name, team_data, week):
     pass_percent = (all_pass_plays / all_num_plays) * 100
     rush_percent = (all_rush_plays / all_num_plays) * 100
 
+    # Third and Fourth down conversion rate
+    all_third_downs = len(team_data[team_data['down'] == 3.0])
+    all_fourth_downs = len(team_data[team_data['down'] == 4.0])
+
+    converted_third_downs = len(team_data[team_data['third_down_converted'] == 1.0])
+    converted_fourth_downs = len(team_data[team_data['fourth_down_converted'] == 1.0])
+
+    third_down_completion = converted_third_downs / all_third_downs
+    fourth_down_completion = converted_fourth_downs / all_fourth_downs
+    
+
     offensive_stats.append({
         'week': week,
         'team_name': team_name,
@@ -129,8 +140,16 @@ def get_offensive_week_data(team_name, team_data, week):
         'epa_per_rush': epa_per_rush,
         'epa_per_pass': epa_per_pass,
         'pass_percent': pass_percent,
-        'rush_percent': rush_percent
+        'rush_percent': rush_percent,
+        'third_down_completion': third_down_completion,
+        'fourth_down_completion': fourth_down_completion
         
     })
 
     return pd.DataFrame(offensive_stats)
+
+#TODO
+# Possible new inputs: vegas odds, offensive team 3rd and 4th down conversions, defensive conversion allow rate,
+# completion percentage + advnaced cpoe, possible weather, team touchdowns and percentage of plays that end 
+# in td/success rate, home or away, player xYAC,
+#  
