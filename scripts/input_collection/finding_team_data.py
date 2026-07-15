@@ -1,4 +1,4 @@
-import pandas as pd 
+import pandas as pd
 
 
 def get_offensive_data(team_name, team_data): 
@@ -123,15 +123,28 @@ def get_offensive_week_data(team_name, team_data, week):
     rush_percent = (all_rush_plays / all_num_plays) * 100
 
     # Third and Fourth down conversion rate
-    all_third_downs = len(team_data[team_data['down'] == 3.0])
-    all_fourth_downs = len(team_data[team_data['down'] == 4.0])
+    all_third_downs = len(all_plays[all_plays['down'] == 3.0])
+    all_fourth_downs = len(all_plays[all_plays['down'] == 4.0])
 
-    converted_third_downs = len(team_data[team_data['third_down_converted'] == 1.0])
-    converted_fourth_downs = len(team_data[team_data['fourth_down_converted'] == 1.0])
+    converted_third_downs = len(all_plays[all_plays['third_down_converted'] == 1.0])
+    converted_fourth_downs = len(all_plays[all_plays['fourth_down_converted'] == 1.0])
 
-    third_down_completion = converted_third_downs / all_third_downs
-    fourth_down_completion = converted_fourth_downs / all_fourth_downs
-    
+    third_down_completion = converted_third_downs / all_third_downs if all_third_downs > 0 else 0
+    fourth_down_completion = converted_fourth_downs / all_fourth_downs if all_fourth_downs > 0 else 0
+
+    # Percentage of drives the team scores/success rate
+    total_drives = all_plays.groupby('week')['down'].nunique().sum()
+
+    # Filter for scoring plays
+    successful_drives_df = all_plays[(all_plays['touchdown'] == 1) | (all_plays['field_goal_result'] == "made")]
+
+    # Count unique successful combinations of week and drive
+    successful_drives = successful_drives_df.groupby('week')['down'].nunique().sum()
+
+    success_rate = successful_drives / total_drives if total_drives > 0 else 0
+
+    # Home or away
+    home_team = 1 if all_plays.iloc[0]['home_team'] == team_name else 0
 
     offensive_stats.append({
         'week': week,
@@ -142,14 +155,14 @@ def get_offensive_week_data(team_name, team_data, week):
         'pass_percent': pass_percent,
         'rush_percent': rush_percent,
         'third_down_completion': third_down_completion,
-        'fourth_down_completion': fourth_down_completion
-        
+        'fourth_down_completion': fourth_down_completion,
+        'success_rate': success_rate,
+        'home_team': home_team
     })
 
     return pd.DataFrame(offensive_stats)
 
-#TODO
+# TODO
 # Possible new inputs: vegas odds, offensive team 3rd and 4th down conversions, defensive conversion allow rate,
 # completion percentage + advnaced cpoe, possible weather, team touchdowns and percentage of plays that end 
 # in td/success rate, home or away, player xYAC,
-#  

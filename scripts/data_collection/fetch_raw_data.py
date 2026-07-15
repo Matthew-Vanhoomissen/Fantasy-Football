@@ -21,6 +21,3 @@ def get_season_data(season):
     output_path = f"data/play_by_play/play_by_play_{season}.csv"
     pbp.to_csv(output_path, index=False)
     print(f"Data saved to {output_path}")
-
-
-get_season_data(2020)

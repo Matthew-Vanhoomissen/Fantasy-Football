@@ -35,33 +35,33 @@ def get_player_week_data(player_name, team_name, team_data, all_stats, week_inpu
     )
 
     # Get previous weeks data
-    pdp = team_data[team_data['week'] < week_input]
+    pbp = team_data[team_data['week'] < week_input]
 
-    games_played = pdp['week'].nunique()
+    games_played = pbp['week'].nunique()
     
     if games_played < 3:
         return None
 
     # Calculate season averages
-    total_P_Yards = pdp[pdp['passer_player_name'] == player_name]['passing_yards'].sum()
-    total_R_Yards = pdp[pdp['rusher_player_name'] == player_name]['rushing_yards'].sum()
+    total_P_Yards = pbp[pbp['passer_player_name'] == player_name]['passing_yards'].sum()
+    total_R_Yards = pbp[pbp['rusher_player_name'] == player_name]['rushing_yards'].sum()
     
     average_P_Yards = total_P_Yards / games_played
     average_R_Yards = total_R_Yards / games_played
 
-    receptions = len(pdp[(pdp['receiver_player_name'] == player_name) & (pdp['complete_pass'] == 1)])
-    receiving_yards = pdp[pdp['receiver_player_name'] == player_name]['receiving_yards'].sum()
+    receptions = len(pbp[(pbp['receiver_player_name'] == player_name) & (pbp['complete_pass'] == 1)])
+    receiving_yards = pbp[pbp['receiver_player_name'] == player_name]['receiving_yards'].sum()
     average_rec_yards = receiving_yards / games_played
 
-    interceptions = pdp[pdp['passer_player_name'] == player_name]['interception'].sum()
-    fumbles_lost = pdp[pdp['fumbled_1_player_name'] == player_name]['fumble_lost'].sum()
-    pTd = pdp[pdp['passer_player_name'] == player_name]['pass_touchdown'].sum()
-    rtd = pdp[pdp['rusher_player_name'] == player_name]['rush_touchdown'].sum()
-    recTd = pdp[pdp['receiver_player_name'] == player_name]['pass_touchdown'].sum()
+    interceptions = pbp[pbp['passer_player_name'] == player_name]['interception'].sum()
+    fumbles_lost = pbp[pbp['fumbled_1_player_name'] == player_name]['fumble_lost'].sum()
+    pTd = pbp[pbp['passer_player_name'] == player_name]['pass_touchdown'].sum()
+    rtd = pbp[pbp['rusher_player_name'] == player_name]['rush_touchdown'].sum()
+    recTd = pbp[pbp['receiver_player_name'] == player_name]['pass_touchdown'].sum()
 
-    two_pt_pass = (pdp[pdp['passer_player_name'] == player_name]['two_point_conv_result'] == 'success').sum()
-    two_pt_rush = (pdp[pdp['rusher_player_name'] == player_name]['two_point_conv_result'] == 'success').sum()
-    two_pt_rec = (pdp[pdp['receiver_player_name'] == player_name]['two_point_conv_result'] == 'success').sum()
+    two_pt_pass = (pbp[pbp['passer_player_name'] == player_name]['two_point_conv_result'] == 'success').sum()
+    two_pt_rush = (pbp[pbp['rusher_player_name'] == player_name]['two_point_conv_result'] == 'success').sum()
+    two_pt_rec = (pbp[pbp['receiver_player_name'] == player_name]['two_point_conv_result'] == 'success').sum()
 
     total_F_Points = (
         (total_P_Yards * .04) +
@@ -79,15 +79,34 @@ def get_player_week_data(player_name, team_name, team_data, all_stats, week_inpu
     )
     average_F_Points = total_F_Points / games_played
 
-    # Plays inside opponent 20 yard line
-    red_zone_targets = pdp[(pdp['receiver_player_name'] == player_name) &
-                           (abs(pdp['yardline_100'] - 100) <= 20) &
-                           (pdp['side_of_field'] != team_name)]
-    red_zone_carries = pdp[(pdp['rusher_player_name'] == player_name) &
-                           (abs(pdp['yardline_100'] - 100) <= 20) &
-                           (pdp['side_of_field'] != team_name)]
+    rz_targets_df = pbp[
+        (pbp['receiver_player_name'] == player_name) &
+        (pbp['yardline_100'] <= 20)
+    ]
+    red_zone_targets = rz_targets_df.shape[0]
 
-    weeks = sorted(pdp['week'].unique())
+    rz_carries_df = pbp[
+        (pbp['rusher_player_name'] == player_name) &
+        (pbp['yardline_100'] <= 20)
+    ]
+    red_zone_carries = rz_carries_df.shape[0]
+
+    # Unique weeks list
+    weeks = sorted(pbp['week'].unique())
+
+    # 2. Passing Completion Percentage
+    pass_attempts_df = pbp[
+        (pbp['passer_player_name'] == player_name) &
+        (pbp['play_type'] == 'pass')
+    ]
+
+    completions_df = pass_attempts_df[pass_attempts_df['complete_pass'] == 1]
+
+    total_pass_attempts = pass_attempts_df.shape[0]
+    completions = completions_df.shape[0]
+
+    # Calculate percentage
+    completion_percentage = (completions / total_pass_attempts) if total_pass_attempts > 0 else 0
 
     positive_difference = []
     negative_difference = []
@@ -95,7 +114,7 @@ def get_player_week_data(player_name, team_name, team_data, all_stats, week_inpu
     bust_games = 0
     
     for week_num in weeks:
-        week_data = pdp[pdp['week'] == week_num]
+        week_data = pbp[pbp['week'] == week_num]
         
         total_P_YardsW = week_data[week_data['passer_player_name'] == player_name]['passing_yards'].sum()
         total_R_YardsW = week_data[week_data['rusher_player_name'] == player_name]['rushing_yards'].sum()
@@ -134,13 +153,11 @@ def get_player_week_data(player_name, team_name, team_data, all_stats, week_inpu
     else:
         bust_points = 0
 
-    # TODO If we are going off residuals we need the bust and boom poitns to be the difference between and not combination
-
     # Last 3 weeks
     last_three_weeks = 0
     weeks_counted = 0
     for week in weeks[-3:]:
-        week_data = pdp[pdp['week'] == week]
+        week_data = pbp[pbp['week'] == week]
 
         total_P_YardsW = week_data[week_data['passer_player_name'] == player_name]['passing_yards'].sum()
         total_R_YardsW = week_data[week_data['rusher_player_name'] == player_name]['rushing_yards'].sum()
@@ -183,7 +200,8 @@ def get_player_week_data(player_name, team_name, team_data, all_stats, week_inpu
         'boom_points_average': boom_points,
         'last_three_weeks_diff': three_week_average - average_F_Points,
         'redzone_carries': red_zone_carries,
-        'redzone_targets': red_zone_targets
+        'redzone_targets': red_zone_targets,
+        'completion_percentage': completion_percentage
     }]
 
     player_stats_dataframe = pd.DataFrame(player_stats)

@@ -6,6 +6,7 @@ def edit_data(year):
         'week',
         'posteam',
         'defteam',
+        'down',
         'passer_player_name',
         'rusher_player_name',
         'receiver_player_name',
@@ -41,13 +42,11 @@ def edit_data(year):
         'home_team',
         'away_team',
         'yardline_100',
-        'side_of_field'
+        'side_of_field',
+        'third_down_converted',
+        'fourth_down_converted'
     ]
 
     all_data = pd.read_csv(f"data/play_by_play/play_by_play_202{year}.csv", low_memory=False, dtype={'week': 'int8', 'season': 'int16'}, usecols=NEEDED_COLUMNS)
 
     all_data.to_csv(f"data/play_by_play/play_by_play_202{year}.csv", index=False)
-
-
-for i in range(2, 6):
-    edit_data(i)

@@ -8,6 +8,8 @@ from scripts.input_collection.player_stats_data import did_player_play_this_week
 from scripts.input_collection.defensive_team_data import get_defensive_week_data
 from scripts.input_collection.collection_methods import create_csvs_offense
 from scripts.input_collection.collection_methods import create_csvs_defense
+from scripts.data_collection.fetch_raw_data import get_season_data
+from scripts.csv_manipulation.shrink_csv import edit_data
 
 
 def create_year_data(num):
@@ -95,6 +97,8 @@ def create_year_data(num):
         final_data.to_csv("data/training_dataset/training_dataset.csv", index=False)
 
 
-create_year_data(5)
-# for i in range(2, 6):
-#     create_year_data(i)
+# create_year_data(5)
+for i in range(2, 6):
+    get_season_data(2020 + i)
+    edit_data(i)
+    create_year_data(i)
