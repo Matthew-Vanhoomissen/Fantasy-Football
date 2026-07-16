@@ -21,7 +21,9 @@ feature_cols = [
     "epa_per_rush", "epa_per_pass", "pass_percent", "rush_percent",
     "allowed_passing_yards", "allowed_rushing_yards", "sack_yards",
     "pass_epa_against", "rush_epa_against", "points_against",
-    "position"
+    "position", "redzone_carries", "redzone_targets", "completion_percentage",
+    "fourth_down_allowed", "third_down_allowed", "fourth_down_completion",
+    "third_down_completion", "success_rate", "home_team"
 ]
 
 # Residual target — what we're now predicting
@@ -48,7 +50,7 @@ model = XGBRegressor(
     min_child_weight=3,    # loosened from 4
     subsample=0.85,
     colsample_bytree=0.75,
-    gamma=0.5,             # loosened from 1
+    gamma=0.8,             # loosened from 1
     reg_lambda=2.0,        # loosened from 3.0
     reg_alpha=0.3,         # loosened from 0.5
     random_state=42,
@@ -151,4 +153,4 @@ os.makedirs("models", exist_ok=True)
 with open('models/fantasy_model_deviation.pkl', 'wb') as f:
     pickle.dump(model_data, f)
 
-print("✅ Model saved to models/fantasy_model_deviation.pkl")
+print("✅ Model saved to models/fantasy_model_final.pkl")
