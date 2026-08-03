@@ -8,8 +8,8 @@ export default function Home() {
   const [player1, setPlayer1] = useState("");
   const [player2, setPlayer2] = useState("");
 
-  const [testing, setTesting] = useState("");
-  const [confidence, setConfidence] = useState("")
+  const [result, setResult] = useState("");
+  const [additionalInfo, setAdditionalInfo] = useState("")
 
   const [avgFP1, setAvgFP1] = useState(0)
   const [momentum1, setMomentum1] = useState(0)
@@ -38,9 +38,12 @@ export default function Home() {
 
   const [emailCopied, setEmailCopied] = useState(false)
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+  //const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+  const API_URL = "http://localhost:5000"
 
   async function submit() {
+    setResult("Loading...")
+    setAdditionalInfo("")
     const res = await fetch(`${API_URL}/`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -48,60 +51,76 @@ export default function Home() {
     });
 
     const data = await res.json();
+    console.log(JSON.stringify(data, null, 2));
+    console.log("data.data:", data.data);
+    console.log("type:", typeof data.data);
     if(data.status === 'failed' || data.data === null) {
       if(data.reason === "NPF") {
-        setTesting("No player found. Check spelling and capitalization")
+        setResult("No player found. Check spelling and capitalization")
       }
       else if(data.reason === "NDF") {
-        setTesting("No data found for selected player (injuries this season or has not made an appearance). Player may be on bye week")
+        setResult("No data found for selected player (injuries this season or has not made an appearance). Player may be on bye week")
       }
-      setConfidence("")
+      else if(data.reason === "BW"){
+        setResult("This week is a bi-week for one of these players. No predictions can be made on a bi-week. Please try a different week!")
+      }
+      else {
+        setResult(data.reason)
+      }
     }
     else {
       setAvgFP1(data.display1['average_fantasy_points'].toFixed(2))
       setPosition1(data.display1['position'])
-      setTd1(data.display1['td_rate'].toFixed(2))
+      setTd1(data.display1['success_rate'].toFixed(2))
       setMomentum1(data.display1['recent_momentum'].toFixed(2))
       if(data.display1['position'] === "QB") {
         setPosStat1("Average Passing Yards: " + data.display1['average_passing_yards'].toFixed(2))
+        setEpa1(data.display1['epa_per_pass'].toFixed())
       }
       else if(data.display1['position'] === "RB") {
         setPosStat1("Average Rushing Yards: " + data.display1['average_rushing_yards'].toFixed(2))
+        setEpa1(data.display1['epa_per_rush'].toFixed())
       }
       else if(data.display1['position'] === "WR" || data.display1['position'] === "TE") {
         setPosStat1("Average Recieving Yards: " + data.display1['average_recieving_yards'].toFixed(2))
+        setEpa1(data.display1['epa_per_pass'].toFixed())
       }
       else {
         setPosStat1("")
+        setEpa1(0)
       }
-      setEpa1(data.display1['epa_per_play'].toFixed(2))
       setTeam1(data.display1['team'])
       
       setAvgFP2(data.display2['average_fantasy_points'].toFixed(2))
       setPosition2(data.display2['position'])
-      setTd2(data.display2['td_rate'].toFixed(2))
+      setTd2(data.display2['success_rate'].toFixed(2))
       setMomentum2(data.display2['recent_momentum'].toFixed(2))
       if(data.display2['position'] === "QB") {
         setPosStat2("Average Passing Yards: " + data.display2['average_passing_yards'].toFixed(2))
+        setEpa2(data.display2['epa_per_pass'].toFixed(2))
       }
       else if(data.display2['position'] === "RB") {
         setPosStat2("Average Rushing Yards: " + data.display2['average_rushing_yards'].toFixed(2))
+        setEpa2(data.display2['epa_per_rush'].toFixed(2))
       }
       else if(data.display2['position'] === "WR" || data.display2['position'] === "TE") {
         setPosStat2("Average Recieving Yards: " + data.display2['average_recieving_yards'].toFixed(2))
+        setEpa2(data.display2['epa_per_pass'].toFixed(2))
       }
       else {
         setPosStat2("")
+        setEpa2(0)
       }
-      setEpa2(data.display2['epa_per_play'].toFixed(2))
-      if(data.data['recommended_player'] === 1) {
-        setTesting("We recommend player " + player1 + ",")
+      if(data.data['winner'] === 1) {
+        setResult("We recommend player " + player1)
       }
       else {
-        setTesting("We recommend player " + player2 + ",")
+        setResult("We recommend player " + player2)
+      }
+      if(data.reason == "ODF") {
+        setAdditionalInfo("Data from one of these players is from the previous season since none could be found for the current one. Keep in mind the result may be less accurate")
       }
       setTeam2(data.display2['team'])
-      setConfidence(" with a confidence " + (data.data['confidence']).toFixed(2) + " percent")
     }
   }
 
@@ -299,7 +318,7 @@ export default function Home() {
                 onChange={(e) => setWeek(Number(e.target.value))}
                 className="w-full border-2 border-blue-300 rounded-lg px-3 md:px-4 py-2 md:py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
-                {Array.from({ length: 15 }, (_, i) => i + 4).map((w) => (
+                {Array.from({ length: 18 }, (_, i) => i + 1).map((w) => (
                   <option key={w} value={w}>Week {w}</option>
                 ))}
               </select>
@@ -349,14 +368,14 @@ export default function Home() {
             </button>
 
             {/* Results */}
-            {testing && (
+            {result && (
               <div className="mt-6 md:mt-8 bg-white border-2 border-blue-300 rounded-xl p-6 md:p-8 shadow-lg">
                 <div className="text-center">
                   <p className="text-xl md:text-2xl font-bold text-blue-900 mb-2">
-                    {testing}
+                    {result}
                   </p>
-                  <p className="text-lg md:text-xl text-blue-600 font-semibold">
-                    {confidence}
+                  <p className="text-base font-bold text-blue-900 mb-2">
+                    {additionalInfo}
                   </p>
                 </div>
               </div>

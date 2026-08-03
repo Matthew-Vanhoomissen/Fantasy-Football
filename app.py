@@ -1,23 +1,26 @@
 import os
 import sys
+from flask import jsonify, request, Flask
+from flask_cors import CORS
+from scripts.input_collection.total_data_collection import get_prediction
+import pandas as pd
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-from flask import jsonify, request, Flask
-from flask_cors import CORS
-from scripts.model_prediction.player_prediction import final_result
-import pandas as pd
-
-
 app = Flask(__name__)
+# CORS(app, origins=[
+#     "http://localhost:3000",
+#     "https://fantasy-football-7w2a.vercel.app"
+# ])
 CORS(app, origins=[
     "http://localhost:3000",
-    "https://fantasy-football-7w2a.vercel.app"
 ])
 
+CURRENT_SEASON = 2025
 
 name_file = pd.read_csv("data/nfl_players.csv", low_memory=False)
-all_data = pd.read_csv("data/play_by_play_2025.csv", low_memory=False)
+all_data_current = pd.read_csv(f"data/play_by_play/play_by_play_{CURRENT_SEASON}.csv", low_memory=False)
+all_data_past = pd.read_csv(f"data/play_by_play/play_by_play_{CURRENT_SEASON - 1}.csv", low_memory=False)
 
 
 def get_top_players_by_position(player_data, top_n=20):
@@ -34,6 +37,14 @@ def get_top_players_by_position(player_data, top_n=20):
     return results
 
 
+try:
+    player_df = pd.read_csv('data/fantasy_points.csv')  
+    TOP_PLAYERS_CACHE = get_top_players_by_position(player_df, top_n=20)
+except Exception as e:
+    print(f"Error loading player data: {e}")
+    TOP_PLAYERS_CACHE = None
+
+
 def format_players(data):
     result = []
     for row in data.itertuples(index=False):
@@ -45,21 +56,15 @@ def format_players(data):
         })
     return result
 
-try:
-    player_df = pd.read_csv('data/fantasy_points.csv')  
-    TOP_PLAYERS_CACHE = get_top_players_by_position(player_df, top_n=20)
-except Exception as e:
-    print(f"Error loading player data: {e}")
-    TOP_PLAYERS_CACHE = None
-
 
 @app.route("/", methods=["POST"])
 def prediction():
     data = request.json
-    result, display1, display2, reason = final_result(data['player1'], data['player2'], data['week'], name_file, all_data)
-    if result is None or display1 is None or display2 is None:
-        return jsonify({"data": None, "display1": None, "display2": None,"status": "failed", "reason": reason})
-    return jsonify({"data": result, "display1": display1, "display2": display2, "status": "success", "reason": None})
+    result, display1, display2, reason = get_prediction(data['player1'], data['player2'], data['week'], name_file, all_data_current, all_data_past)
+
+    if reason != "success" and reason != "ODF":
+        return jsonify({"data": None, "display1": None, "display2": None, "status": "failed", "reason": reason})
+    return jsonify({"data": result, "display1": display1, "display2": display2, "status": "success", "reason": reason})
 
 
 @app.route("/top-players", methods=["GET"])

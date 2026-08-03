@@ -25,6 +25,9 @@ def evaluate_pairwise_accuracy(output_df, min_predictions=True):
         if len(week_data) < 2:
             continue
 
+        total_close_pairs = 0
+        correct_close_pairs = 0
+
         correct = 0
         total = 0
         ties = 0
@@ -43,17 +46,27 @@ def evaluate_pairwise_accuracy(output_df, min_predictions=True):
 
             if actual_winner == pred_winner:
                 correct += 1
+
+            if abs(p1['average_fantasy_points'] - p2['average_fantasy_points']) < 3:
+                total_close_pairs += 1
+                if actual_winner == pred_winner:
+                    correct_close_pairs += 1
+
             total += 1
 
         if total > 0:
             week_accuracy = correct / total
+            close_week_accuracy = correct_close_pairs / total_close_pairs
             results.append({
                 'season': season,
                 'week': week,
                 'correct': correct,
                 'total': total,
                 'ties_skipped': ties,
-                'accuracy': week_accuracy
+                'accuracy': week_accuracy,
+                'close_avg_total': total_close_pairs,
+                'close_avg_correct': correct_close_pairs,
+                'close_avg_accuracy': close_week_accuracy
             })
 
     accuracy_df = pd.DataFrame(results)
@@ -123,6 +136,7 @@ pairwise_df = evaluate_pairwise_accuracy(output)
 print(f"Weeks evaluated: {len(pairwise_df)}")
 print(f"Total comparisons: {pairwise_df['total'].sum():,}")
 print(f"Overall accuracy: {pairwise_df['correct'].sum() / pairwise_df['total'].sum():.4f}")
+print(f"Close pairing accuracy: {pairwise_df['close_avg_correct'].sum() / pairwise_df['close_avg_total'].sum():.4f}")
 print(f"Mean weekly accuracy: {pairwise_df['accuracy'].mean():.4f}")
 print(f"Std weekly accuracy:  {pairwise_df['accuracy'].std():.4f}")
 print(f"Worst week:  S{pairwise_df.loc[pairwise_df['accuracy'].idxmin(), 'season']} "

@@ -9,7 +9,7 @@ import os
 data = pd.read_csv("data/training_dataset/training_dataset.csv", low_memory=False)
 data = data.sort_values(['season', 'week']).reset_index(drop=True)
 
-# data['recent_momentum'] = data['last_three_weeks_diff'] / (data['average_fantasy_points'] + .01)
+data['recent_momentum'] = data['last_three_weeks_diff'] + data['average_fantasy_points']
 
 
 feature_cols = [
@@ -23,7 +23,8 @@ feature_cols = [
     "pass_epa_against", "rush_epa_against", "points_against",
     "position", "redzone_carries", "redzone_targets", "completion_percentage",
     "fourth_down_allowed", "third_down_allowed", "fourth_down_completion",
-    "third_down_completion", "success_rate", "home_team"
+    "third_down_completion", "success_rate", "home_team", "position_ranking",
+    "win_percentage", "recent_momentum"
 ]
 
 # Residual target — what we're now predicting
@@ -46,7 +47,7 @@ time_index = data[['season', 'week']]
 model = XGBRegressor(
     n_estimators=700,
     learning_rate=0.01,
-    max_depth=4,
+    max_depth=3,
     min_child_weight=3,    # loosened from 4
     subsample=0.85,
     colsample_bytree=0.75,
@@ -150,7 +151,7 @@ model_data = {
 os.makedirs("models", exist_ok=True)
 
 # Save to file
-with open('models/fantasy_model_deviation.pkl', 'wb') as f:
+with open('models/fantasy_model_final.pkl', 'wb') as f:
     pickle.dump(model_data, f)
 
 print("✅ Model saved to models/fantasy_model_final.pkl")

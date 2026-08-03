@@ -44,7 +44,8 @@ def edit_data(year):
         'yardline_100',
         'side_of_field',
         'third_down_converted',
-        'fourth_down_converted'
+        'fourth_down_converted',
+        'result'
     ]
 
     all_data = pd.read_csv(f"data/play_by_play/play_by_play_202{year}.csv", low_memory=False, dtype={'week': 'int8', 'season': 'int16'}, usecols=NEEDED_COLUMNS)

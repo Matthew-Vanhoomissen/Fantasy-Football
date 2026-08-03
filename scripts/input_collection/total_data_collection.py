@@ -10,61 +10,51 @@ from .collection_methods import create_csvs_defense, create_csvs_offense
 
 def get_player_input(player_name, offensive_team_name, defensive_team_name, all_data, week):
    
-    defensive_team_data1 = create_csvs_defense(all_data, defensive_team_name)
-    offensive_team_data1, player_data1 = create_csvs_offense(all_data, player_name, offensive_team_name)
+    defensive_team_data = create_csvs_defense(all_data, defensive_team_name)
+    offensive_team_data, player_data = create_csvs_offense(all_data, player_name, offensive_team_name)
 
-    defensive_stats1 = get_defensive_week_data(defensive_team_name, defensive_team_data1, week)
-    offensive_stats1 = get_offensive_week_data(offensive_team_name, offensive_team_data1, week)
-    player_stats1 = get_player_week_data(player_name, offensive_team_name, player_data1, all_data, week)
+    defensive_stats, def_result = get_defensive_week_data(defensive_team_name, defensive_team_data, week)
+    offensive_stats = get_offensive_week_data(offensive_team_name, offensive_team_data, week)
+    player_stats = get_player_week_data(player_name, offensive_team_name, player_data, all_data, week)
 
     # TODO This will return null during biweek because it can't find opponent. Make another method
     #      that can be used by the frontend
-    if defensive_stats1 is None or offensive_stats1 is None or player_stats1 is None:
-        return None, None
+    if defensive_stats is None:
+        return None, None, def_result
 
-    offensive_stats1 = offensive_stats1.rename(columns={"team_name": "off_team_name"})
-    defensive_stats1 = defensive_stats1.rename(columns={"team_name": "def_team_name"})
-    player_stats1 = player_stats1.rename(columns={"team_name": "off_team_name"})
+    if offensive_stats is None or player_stats is None:
+        return None, None, "NDF"
 
-    player_stats1["def_team_name"] = defensive_team_name
+    offensive_stats = offensive_stats.rename(columns={"team_name": "off_team_name"})
+    defensive_stats = defensive_stats.rename(columns={"team_name": "def_team_name"})
+    player_stats = player_stats.rename(columns={"team_name": "off_team_name"})
+
+    player_stats["def_team_name"] = defensive_team_name
 
     data = (
-        player_stats1
-        .merge(offensive_stats1, on="off_team_name", how="left")
-        .merge(defensive_stats1, how="left", left_on="def_team_name", right_on="def_team_name")
+        player_stats
+        .merge(offensive_stats, on="off_team_name", how="left")
+        .merge(defensive_stats, how="left", left_on="def_team_name", right_on="def_team_name")
     )
 
-    # === Feature Engineering ===
-    # data['bust_adjusted_avg'] = data['average_fantasy_points'] * (1 - data['bust_percent'])
-    # data['recent_momentum'] = data['average_fantasy_points'] + data['last_three_weeks_diff']
-    # data['boom_weighted_avg'] = data['average_fantasy_points'] * (1 + data['boom_percent'])
-    # data['total_usage'] = data['passing_target_percentage'] + data['rushing_percentage']
-    # data['boom_bust_ratio'] = data['boom_percent'] / (data['bust_percent'] + 0.01)
-    # data['td_rate'] = (data['passing_tds_avg'] + data['rushing_tds_avg'] + data['recieving_tds_avg'])
-    # data['matchup_advantage'] = data['epa_per_play'] - data['avg_epa_against']
-    # data['offensive_efficiency'] = data['epa_per_play'] * data['total_usage']
+    data['recent_momentum'] = data['last_three_weeks_diff'] + data['average_fantasy_points']
 
-    # # Add variance-capturing features
-    # data['recent_volatility'] = abs(data['last_three_weeks_diff'])
-    # data['boom_potential'] = data['boom_points_average'] - data['average_fantasy_points']
-    # data['bust_risk'] = data['average_fantasy_points'] - data['bust_points_average']
-    # data['variance_score'] = (data['boom_percent'] + data['bust_percent']) * data['average_fantasy_points']
-
-    # TODO Doesn't utilize epa per rush/pass. Trim down to just inputs from stats, then build from there
     feature_cols = [
-        "bust_adjusted_avg", "recent_momentum", "boom_weighted_avg",
-        "average_fantasy_points", "passing_target_percentage", "total_usage",
-        "average_passing_yards", "points_against", "bust_points_average",
-        "bust_percent", "boom_bust_ratio", "td_rate", "recieving_tds_avg",
-        "boom_points_average", "rushing_tds_avg", "last_three_weeks_diff",
-        "average_recieving_yards", "average_rushing_yards", "epa_per_play",
-        "matchup_advantage", "offensive_efficiency", "boom_percent",
-        "pass_epa_against", "rush_epa_against",
-        # Variance features
-        "recent_volatility", "boom_potential", "bust_risk", "variance_score"
+        "receptions_avg", "average_passing_yards", "average_rushing_yards",
+        "average_recieving_yards", "passing_tds_avg", "rushing_tds_avg",
+        "recieving_tds_avg", "bust_points_average",
+        "bust_percent", "boom_points_average", "boom_percent",
+        "passing_target_percentage", "rushing_percentage",
+        "epa_per_rush", "epa_per_pass", "pass_percent", "rush_percent",
+        "allowed_passing_yards", "allowed_rushing_yards", "sack_yards",
+        "pass_epa_against", "rush_epa_against", "points_against",
+        "position", "redzone_carries", "redzone_targets", "completion_percentage",
+        "fourth_down_allowed", "third_down_allowed", "fourth_down_completion",
+        "third_down_completion", "success_rate", "home_team", "position_ranking",
+        "win_percentage", "recent_momentum"
     ]
 
-    with open('models/fantasy_model2.pkl', 'rb') as f:
+    with open('models/fantasy_model_final.pkl', 'rb') as f:
         model_data = pickle.load(f)
         xgb_model = model_data['model']
 
@@ -73,66 +63,157 @@ def get_player_input(player_name, offensive_team_name, defensive_team_name, all_
 
     projection = xgb_model.predict(x)
     
-    data['xgb_predicted_points'] = projection
+    result = projection + player_stats.get('average_fantasy_points')
 
     display_cols = [
-        "recent_momentum", "average_fantasy_points", "average_passing_yards", "bust_percent", 
-        "td_rate", "average_recieving_yards", "average_rushing_yards", "boom_percent", 
-        "boom_points_average", "bust_points_average", "epa_per_play"
+        "last_three_weeks_diff", "average_fantasy_points", "average_passing_yards", "bust_percent", 
+        "success_rate", "average_recieving_yards", "average_rushing_yards", "boom_percent", 
+        "boom_points_average", "bust_points_average", "epa_per_pass", "epa_per_rush", "recent_momentum"
     ]
-    display_data = x[display_cols]
+    display_data = data[display_cols]
 
-    return data.iloc[0].to_dict(), display_data.iloc[0].to_dict()
+    return result.iloc[0], display_data.iloc[0].to_dict(), "success"
 
 
-def create_pair_input(player1, player1_team, player1_defense, player2, player2_team, player2_defense, week, all_data):
+def get_prediction(player1_name, player2_name, week, name_file, all_data_current, all_data_past):
+    if convert(player1_name, name_file) is None or convert(player2_name, name_file) is None:
+        return None, None, None, "NPF"
 
-    p1, display1 = get_player_input(player1, player1_team, player1_defense, all_data, week)
-    p2, display2 = get_player_input(player2, player2_team, player2_defense, all_data, week)
+    p1, p1_t, pos1 = convert(player1_name, name_file)
+    print(p1_t)
+    print(p1)
+    p1_d = return_opponent(p1_t, week, 2025)
 
-    if p1 is None or p2 is None:
-        return None, None, None
-    pair = []
+    p2, p2_t, pos2 = convert(player2_name, name_file)
+    print(p2_t)
+    print(p2)
+    p2_d = return_opponent(p2_t, week, 2025)
 
-    pair_features = {
-            # Player 1 features
-            'p1_xgb_pred': p1['xgb_predicted_points'],
-            'p1_avg_points': p1['average_fantasy_points'],
-            'p1_recent_momentum': p1['recent_momentum'],
-            'p1_boom_percent': p1['boom_percent'],
-            'p1_bust_percent': p1['bust_percent'],
-            'p1_usage': p1['total_usage'],
-            'p1_matchup': p1['matchup_advantage'],
-            'p1_variance': p1['variance_score'],
-            'p1_boom_potential': p1['boom_potential'],
-            'p1_bust_risk': p1['bust_risk'],
-            
-            # Player 2 features
-            'p2_xgb_pred': p2['xgb_predicted_points'],
-            'p2_avg_points': p2['average_fantasy_points'],
-            'p2_recent_momentum': p2['recent_momentum'],
-            'p2_boom_percent': p2['boom_percent'],
-            'p2_bust_percent': p2['bust_percent'],
-            'p2_usage': p2['total_usage'],
-            'p2_matchup': p2['matchup_advantage'],
-            'p2_variance': p2['variance_score'],
-            'p2_boom_potential': p2['boom_potential'],
-            'p2_bust_risk': p2['bust_risk'],
-            
-            # Differential features 
-            'pred_diff': p1['xgb_predicted_points'] - p2['xgb_predicted_points'],
-            'avg_diff': p1['average_fantasy_points'] - p2['average_fantasy_points'],
-            'momentum_diff': p1['recent_momentum'] - p2['recent_momentum'],
-            'boom_diff': p1['boom_percent'] - p2['boom_percent'],
-            'usage_diff': p1['total_usage'] - p2['total_usage'],
-            'matchup_diff': p1['matchup_advantage'] - p2['matchup_advantage'],
-            'variance_diff': p1['variance_score'] - p2['variance_score'],
-            
-            # Ratio features
-            'pred_ratio': p1['xgb_predicted_points'] / (p2['xgb_predicted_points'] + 0.1) if p2['xgb_predicted_points'] >= 0 else p1['xgb_predicted_points'] / (p2['xgb_predicted_points']),
-            'avg_ratio': p1['average_fantasy_points'] / (p2['average_fantasy_points'] + 0.1) if p2['average_fantasy_points'] >= 0 else p1['average_fantasy_points'] / (p2['average_fantasy_points']),
-        }
-    pair.append(pair_features)
+    r1, display1, result1 = get_player_input(p1, p1_t, p1_d, all_data_current, week)
+    r2, display2, result2 = get_player_input(p2, p2_t, p2_d, all_data_current, week)
 
-    return pair, display1, display2
+    print(r1)
+    print(r2)
+    result = "success"
+    if r1 is None or r2 is None:
+        if result1 == "BW" or result2 == "BW":
+            print("BW")
+            return None, None, None, "BW"
+        else:
+            result = "NDF"
+            if r1 is None:
+                r1, display1, result1 = get_player_input(p1, p1_t, p1_d, all_data_past, 19)
+            if r2 is None:
+                r2, display2, result2 = get_player_input(p2, p2_t, p2_d, all_data_past, 19)
+            if r1 is None or r2 is None:
+                return None, None, None, result
+            result = "ODF"  # Old data found
+
+    if r1 > r2:
+        winner = 1
+    else:
+        winner = 2
     
+    display1['position'] = pos1
+    display1['team'] = p1_t
+
+    display2['position'] = pos2
+    display2['team'] = p2_t
+
+    print(winner)
+    return {"winner": winner}, display1, display2, result
+
+
+def convert(name, file):
+    SUFFIXES = {"jr", "sr", "ii", "iii", "iv", "v"}
+    override = pd.read_csv("data/override.csv", low_memory=False)
+
+    full_name = name.split(" ", 1)
+    if len(full_name) != 2:
+        return None
+    
+    last_name = full_name[1]
+    first_name = full_name[0]
+    first_initial = first_name[0]
+
+    last_parts_raw = last_name.replace(".", " ").split()
+    last_parts = []
+    for part in last_parts_raw:
+        if part.lower() not in SUFFIXES:
+            if part == "St ":
+                last_parts.append(part + ".")
+            else:
+                last_parts.append(part)
+    
+    cleaned_last = ""
+    for part in last_parts:
+        cleaned_last = cleaned_last + part
+    
+    player = file[(file['first_name'] == first_name) & (file['last_name'] == last_name)]
+
+    match = override[override['player_name'] == name]
+    if not match.empty:
+        abbr = match.iloc[0]['abbreviation']
+        player = player.iloc[0]
+        team = player['team']
+        if team == "LAR":
+            team = "LA"
+        elif team == "WSH":
+            team = "WAS"
+        return abbr, team, player['position']
+
+    if player.empty:
+        return None
+    else:
+        player = player.iloc[0]
+        
+        # Find all players with the same last name AND same first initial
+        same_last_and_initial = file[
+            (file['last_name'] == last_name) & 
+            (file['first_name'].str[0] == first_initial)
+        ].sort_values('first_name')
+        
+        if len(same_last_and_initial) == 1:
+            # Only one player with this last name and first initial
+            abbr = first_name[0] + "." + cleaned_last
+        else:
+            # Multiple players with same initial
+            all_first_names = same_last_and_initial['first_name'].tolist()
+            
+            # Find this player's position in alphabetical order
+            player_index = all_first_names.index(first_name)
+            
+            # Check only players that come BEFORE this one alphabetically
+            chars_needed = 1
+            for i in range(player_index):
+                other_first = all_first_names[i]
+                # Find how many chars needed to differentiate from this earlier player
+                temp_chars = 1
+                while temp_chars <= min(len(first_name), len(other_first)):
+                    if first_name[:temp_chars] != other_first[:temp_chars]:
+                        break
+                    temp_chars += 1
+                chars_needed = max(chars_needed, temp_chars)
+            
+            abbr = first_name[:chars_needed] + "." + cleaned_last
+        team = player['team']
+        if team == "LAR":
+            team = "LA"
+        elif team == "WSH":
+            team = "WAS"
+        return abbr, team, player['position']
+
+
+def return_opponent(team, week, season):
+    schedule = pd.read_csv(f"data/schedule_{season}.csv")
+
+    schedule = schedule[schedule["week"] == week]
+
+    away = schedule[schedule['away_team'] == team]
+    if not away.empty:
+        return (away.iloc[0])['home_team']
+    home = schedule[schedule['home_team'] == team]
+    if not home.empty:
+        return (home.iloc[0])['away_team']
+
+    return None

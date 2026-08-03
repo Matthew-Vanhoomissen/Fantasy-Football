@@ -31,10 +31,10 @@ def create_year_data(num):
         for n in range(4, 18):
             week = n
 
-            print(week)
+            # print(week)
 
             if not did_player_play_this_week(offensive_team_data, player_name, week):
-                print(f"Player did not participate this week {week}")
+                # print(f"Player did not participate this week {week}")
                 continue
 
             defensive_team_name = get_opponent_team(all_data, offensive_team_name, week) # Get team name and data
@@ -86,19 +86,21 @@ def create_year_data(num):
         season_2024 = pd.read_csv("data/training_dataset/training_dataset_2024.csv", low_memory=False)
         season_2023 = pd.read_csv("data/training_dataset/training_dataset_2023.csv", low_memory=False)
         season_2022 = pd.read_csv("data/training_dataset/training_dataset_2022.csv", low_memory=False)
+        season_2021 = pd.read_csv("data/training_dataset/training_dataset_2021.csv", low_memory=False)
 
         # Add season label
         season_data['season'] = 2025
         season_2024['season'] = 2024
         season_2023['season'] = 2023
         season_2022['season'] = 2022
+        season_2021['season'] = 2021
 
-        final_data = pd.concat([season_2022, season_2023, season_2024, season_data], ignore_index=True)
+        final_data = pd.concat([season_2021, season_2022, season_2023, season_2024, season_data], ignore_index=True)
         final_data.to_csv("data/training_dataset/training_dataset.csv", index=False)
 
 
 # create_year_data(5)
-for i in range(2, 6):
+for i in range(1, 6):
     get_season_data(2020 + i)
     edit_data(i)
     create_year_data(i)

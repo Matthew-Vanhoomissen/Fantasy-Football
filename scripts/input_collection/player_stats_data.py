@@ -1,10 +1,20 @@
 import pandas as pd
 from .target_percentage import get_week_percentage
+from scripts.csv_manipulation.add_position_column import assign_position
+from .finding_team_data import get_player_position_rank
 
 
-def get_player_week_data(player_name, team_name, team_data, all_stats, week_input): 
+def get_player_week_data(player_name, team_name, player_data, all_stats, week_input):
+    # Get previous weeks data
+    pbp = player_data[player_data['week'] < week_input]
+
+    games_played = pbp['week'].nunique()
+
+    if games_played < 3:
+        return None
+
     # === Current Week Fantasy Points (target variable) ===
-    current_week_data = team_data[team_data['week'] == week_input]
+    current_week_data = player_data[player_data['week'] == week_input]
 
     cw_passing_yards = current_week_data[current_week_data['passer_player_name'] == player_name]['passing_yards'].sum()
     cw_rushing_yards = current_week_data[current_week_data['rusher_player_name'] == player_name]['rushing_yards'].sum()
@@ -33,14 +43,6 @@ def get_player_week_data(player_name, team_name, team_data, all_stats, week_inpu
         (cw_two_pt_rec * 2) +
         (cw_two_pt_rush * 2)
     )
-
-    # Get previous weeks data
-    pbp = team_data[team_data['week'] < week_input]
-
-    games_played = pbp['week'].nunique()
-    
-    if games_played < 3:
-        return None
 
     # Calculate season averages
     total_P_Yards = pbp[pbp['passer_player_name'] == player_name]['passing_yards'].sum()
@@ -179,6 +181,14 @@ def get_player_week_data(player_name, team_name, team_data, all_stats, week_inpu
 
     three_week_average = last_three_weeks / weeks_counted if weeks_counted > 0 else average_F_Points
     
+    # Player position
+    position = assign_position({'average_passing_yards': average_P_Yards,
+                                'average_rushing_yards': average_R_Yards,
+                                'average_recieving_yards': average_rec_yards})
+
+    # Team position ranking
+    position_ranking = get_player_position_rank(team_name, player_name, position, all_stats, week_input)
+
     percentages = get_week_percentage(team_name, player_name, all_stats, week_input)
 
     player_stats = [{
@@ -201,7 +211,9 @@ def get_player_week_data(player_name, team_name, team_data, all_stats, week_inpu
         'last_three_weeks_diff': three_week_average - average_F_Points,
         'redzone_carries': red_zone_carries,
         'redzone_targets': red_zone_targets,
-        'completion_percentage': completion_percentage
+        'completion_percentage': completion_percentage,
+        'position_ranking': position_ranking,
+        'position': position
     }]
 
     player_stats_dataframe = pd.DataFrame(player_stats)
@@ -236,8 +248,8 @@ def get_opponent_team(all_data, offensive_team_name, week):
     return opponent_team
 
 
-def did_player_play_this_week(team_data, player_name, week):
-    week_data = team_data[team_data['week'] == week]
+def did_player_play_this_week(player_data, player_name, week):
+    week_data = player_data[player_data['week'] == week]
     
     # Check if player actually has any plays recorded this week
     played = (
