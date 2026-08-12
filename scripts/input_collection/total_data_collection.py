@@ -7,15 +7,24 @@ from .finding_team_data import get_offensive_week_data
 from .player_stats_data import get_player_week_data
 from .collection_methods import create_csvs_defense, create_csvs_offense
 
+# For weekly data collection
+from scripts.data_collection.fetch_raw_data import get_season_data
+from scripts.data_collection.get_player_names import get_names
+from scripts.csv_manipulation.edit_names import edit_player_names
+from scripts.csv_manipulation.shrink_csv import edit_data
 
-def get_player_input(player_name, offensive_team_name, defensive_team_name, all_data, week):
+
+CURRENT_SEASON = 2026
+
+
+def get_player_input(player_name, offensive_team_name, defensive_team_name, all_data, week, position):
    
     defensive_team_data = create_csvs_defense(all_data, defensive_team_name)
     offensive_team_data, player_data = create_csvs_offense(all_data, player_name, offensive_team_name)
 
     defensive_stats, def_result = get_defensive_week_data(defensive_team_name, defensive_team_data, week)
     offensive_stats = get_offensive_week_data(offensive_team_name, offensive_team_data, week)
-    player_stats = get_player_week_data(player_name, offensive_team_name, player_data, all_data, week)
+    player_stats = get_player_week_data(player_name, offensive_team_name, player_data, all_data, week, position)
 
     # TODO This will return null during biweek because it can't find opponent. Make another method
     #      that can be used by the frontend
@@ -75,22 +84,41 @@ def get_player_input(player_name, offensive_team_name, defensive_team_name, all_
     return result.iloc[0], display_data.iloc[0].to_dict(), "success"
 
 
-def get_prediction(player1_name, player2_name, week, name_file, all_data_current, all_data_past):
-    if convert(player1_name, name_file) is None or convert(player2_name, name_file) is None:
+def get_prediction(player1_name, player2_name, week, name_file, all_data_current, all_data_past, override_name_file):
+    p1, p1_t, pos1 = convert(player1_name, name_file, override_name_file)
+    p2, p2_t, pos2 = convert(player2_name, name_file, override_name_file)
+    if p1 is None or p2 is None:
         return None, None, None, "NPF"
 
-    p1, p1_t, pos1 = convert(player1_name, name_file)
+    # Assign position as number
+    if pos1 == "QB":
+        pos1 = 0
+    elif pos1 == "RB" or pos1 == "FB":
+        pos1 = 1
+    elif pos1 == "WR" or pos1 == "TE":
+        pos1 = 2
+    else:
+        pos1 = -1
+
+    if pos2 == "QB":
+        pos2 = 0
+    elif pos2 == "RB" or pos2 == "FB":
+        pos2 = 1
+    elif pos2 == "WR" or pos2 == "TE":
+        pos2 = 2
+    else:
+        pos2 = -1
+
     print(p1_t)
     print(p1)
     p1_d = return_opponent(p1_t, week, 2025)
-
-    p2, p2_t, pos2 = convert(player2_name, name_file)
+    
     print(p2_t)
     print(p2)
     p2_d = return_opponent(p2_t, week, 2025)
 
-    r1, display1, result1 = get_player_input(p1, p1_t, p1_d, all_data_current, week)
-    r2, display2, result2 = get_player_input(p2, p2_t, p2_d, all_data_current, week)
+    r1, display1, result1 = get_player_input(p1, p1_t, p1_d, all_data_current, week, pos1)
+    r2, display2, result2 = get_player_input(p2, p2_t, p2_d, all_data_current, week, pos2)
 
     print(r1)
     print(r2)
@@ -124,13 +152,12 @@ def get_prediction(player1_name, player2_name, week, name_file, all_data_current
     return {"winner": winner}, display1, display2, result
 
 
-def convert(name, file):
+def convert(name, file, override):
     SUFFIXES = {"jr", "sr", "ii", "iii", "iv", "v"}
-    override = pd.read_csv("data/override.csv", low_memory=False)
 
     full_name = name.split(" ", 1)
     if len(full_name) != 2:
-        return None
+        return None, None, None
     
     last_name = full_name[1]
     first_name = full_name[0]
@@ -163,11 +190,11 @@ def convert(name, file):
         return abbr, team, player['position']
 
     if player.empty:
-        return None
+        return None, None, None
     else:
         player = player.iloc[0]
         
-        # Find all players with the same last name AND same first initial
+        # Find all players with the same last name and same first initial
         same_last_and_initial = file[
             (file['last_name'] == last_name) & 
             (file['first_name'].str[0] == first_initial)
@@ -217,3 +244,18 @@ def return_opponent(team, week, season):
         return (home.iloc[0])['away_team']
 
     return None
+
+
+def weekly_data_collection():
+    get_season_data(CURRENT_SEASON)
+    edit_data(CURRENT_SEASON)
+
+    get_season_data(CURRENT_SEASON - 1)
+    edit_data(CURRENT_SEASON)
+
+    get_names()
+    edit_player_names()
+
+
+if __name__ == "__main__":
+    weekly_data_collection()

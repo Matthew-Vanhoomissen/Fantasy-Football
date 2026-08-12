@@ -2,7 +2,7 @@ import pandas as pd
 import os
 
 
-season = 2025
+season = 2026
 DATA_DIR = "../data"
 
 url = "https://github.com/nflverse/nfldata/raw/master/data/games.csv"

@@ -4,259 +4,290 @@ from scripts.csv_manipulation.add_position_column import assign_position
 from .finding_team_data import get_player_position_rank
 
 
-def get_player_week_data(player_name, team_name, player_data, all_stats, week_input):
-    # Get previous weeks data
-    pbp = player_data[player_data['week'] < week_input]
+# ============================================================
+# FANTASY POINTS CALCULATION
+# ============================================================
 
-    games_played = pbp['week'].nunique()
+def calculate_fantasy_points(
+    passing_yards: float,
+    rushing_yards: float,
+    receiving_yards: float,
+    receptions: int,
+    interceptions: int,
+    fumbles_lost: int,
+    pass_td: int,
+    rush_td: int,
+    rec_td: int,
+    two_pt_pass: int,
+    two_pt_rush: int,
+    two_pt_rec: int
+) -> float:
+    """
+    Calculates PPR fantasy points from raw stat inputs.
+    Scoring: 0.04/passing yard, 0.1/rushing yard, 0.1/receiving yard,
+             1/reception, 4/pass TD, 6/rush TD, 6/rec TD,
+             -2/interception, -2/fumble lost, 2/two-point conversion
+    """
+    return (
+        (passing_yards   * 0.04) +
+        (rushing_yards   * 0.10) +
+        (receiving_yards * 0.10) +
+        (receptions            ) -
+        (interceptions   * 2   ) +
+        (pass_td         * 4   ) +
+        (rush_td         * 6   ) +
+        (rec_td          * 6   ) -
+        (fumbles_lost    * 2   ) +
+        (two_pt_pass     * 2   ) +
+        (two_pt_rush     * 2   ) +
+        (two_pt_rec      * 2   )
+    )
+
+
+def extract_player_stats_for_plays(plays: pd.DataFrame, player_name: str) -> dict:
+    """
+    Extracts all raw counting stats for a player from a set of plays.
+    Returns a dict of raw totals ready for fantasy point calculation.
+    """
+    passing_plays   = plays[plays['passer_player_name']   == player_name]
+    rushing_plays   = plays[plays['rusher_player_name']   == player_name]
+    receiving_plays = plays[plays['receiver_player_name'] == player_name]
+
+    return {
+        'passing_yards'   : passing_plays['passing_yards'].sum(),
+        'rushing_yards'   : rushing_plays['rushing_yards'].sum(),
+        'receiving_yards' : receiving_plays['receiving_yards'].sum(),
+        'receptions'      : len(receiving_plays[receiving_plays['complete_pass'] == 1]),
+        'interceptions'   : passing_plays['interception'].sum(),
+        'fumbles_lost'    : plays[plays['fumbled_1_player_name'] == player_name]['fumble_lost'].sum(),
+        'pass_td'         : passing_plays['pass_touchdown'].sum(),
+        'rush_td'         : rushing_plays['rush_touchdown'].sum(),
+        'rec_td'          : receiving_plays['pass_touchdown'].sum(),
+        'two_pt_pass'     : (passing_plays['two_point_conv_result']   == 'success').sum(),
+        'two_pt_rush'     : (rushing_plays['two_point_conv_result']   == 'success').sum(),
+        'two_pt_rec'      : (receiving_plays['two_point_conv_result'] == 'success').sum(),
+    }
+
+
+def _calculate_boom_bust_metrics(
+    prior_plays: pd.DataFrame,
+    player_name: str,
+    average_fp: float,
+    weeks: list,
+    threshold: float = 6.0
+) -> dict:
+    """
+    Calculates boom/bust game counts and average point differentials.
+    A boom game exceeds the player average by threshold points.
+    A bust game falls below the player average by threshold points.
+    """
+    positive_diffs = []
+    negative_diffs = []
+
+    for week_num in weeks:
+        week_plays = prior_plays[prior_plays['week'] == week_num]
+        raw        = extract_player_stats_for_plays(week_plays, player_name)
+        week_fp    = calculate_fantasy_points(**raw)
+        diff       = week_fp - average_fp
+
+        if diff > threshold:
+            positive_diffs.append(diff)
+        elif diff < -threshold:
+            negative_diffs.append(diff)
+
+    boom_games = len(positive_diffs)
+    bust_games = len(negative_diffs)
+
+    return {
+        'boom_games'  : boom_games,
+        'bust_games'  : bust_games,
+        'boom_points' : sum(positive_diffs) / boom_games if boom_games > 0 else 0,
+        'bust_points' : sum(negative_diffs) / bust_games if bust_games > 0 else 0,
+    }
+
+
+def _calculate_recent_average(
+    prior_plays: pd.DataFrame,
+    player_name: str,
+    weeks: list,
+    n_weeks: int = 3
+) -> float:
+    """
+    Calculates the average fantasy points over the last n_weeks games.
+    """
+    recent_total  = 0.0
+    weeks_counted = 0
+
+    for week in weeks[-n_weeks:]:
+        week_plays = prior_plays[prior_plays['week'] == week]
+        raw        = extract_player_stats_for_plays(week_plays, player_name)
+        recent_total  += calculate_fantasy_points(**raw)
+        weeks_counted += 1
+
+    return recent_total / weeks_counted if weeks_counted > 0 else 0.0
+
+
+# ============================================================
+# PLAYER DATA POINTS BUILDER
+# ============================================================
+
+def get_player_week_data(
+    player_name: str,
+    team_name: str,
+    player_data: pd.DataFrame,
+    all_stats: pd.DataFrame,
+    week_input: int,
+    position: int
+) -> pd.DataFrame | None:
+    """
+    Builds a single row of model features for a player in a given week.
+    All features use strictly prior week data to prevent leakage.
+    Returns None if the player has fewer than 3 games played.
+
+    Args:
+        player_name : Abbreviated player name (e.g. 'T.Hill')
+        team_name   : NFL team abbreviation (e.g. 'MIA')
+        player_data : Play-by-play data for the player's team
+        all_stats   : Full play-by-play data across all teams
+        week_input  : Current week being predicted
+        position    : Encoded position (0=QB, 1=RB, 2=WR/TE, 3=FLEX, -1=Unknown)
+    """
+
+    # === Prior weeks only — no leakage ===
+    prior_plays  = player_data[player_data['week'] < week_input]
+    games_played = prior_plays['week'].nunique()
 
     if games_played < 3:
         return None
 
-    # === Current Week Fantasy Points (target variable) ===
-    current_week_data = player_data[player_data['week'] == week_input]
+    # === Current week target variable ===
+    current_week_plays = player_data[player_data['week'] == week_input]
+    cw_raw             = extract_player_stats_for_plays(current_week_plays, player_name)
+    week_fantasy_points = calculate_fantasy_points(**cw_raw)
 
-    cw_passing_yards = current_week_data[current_week_data['passer_player_name'] == player_name]['passing_yards'].sum()
-    cw_rushing_yards = current_week_data[current_week_data['rusher_player_name'] == player_name]['rushing_yards'].sum()
-    cw_receiving_yards = current_week_data[current_week_data['receiver_player_name'] == player_name]['receiving_yards'].sum()
-    cw_receptions = len(current_week_data[(current_week_data['receiver_player_name'] == player_name) & (current_week_data['complete_pass'] == 1)])
-    cw_interceptions = current_week_data[current_week_data['passer_player_name'] == player_name]['interception'].sum()
-    cw_fumbles_lost = current_week_data[current_week_data['fumbled_1_player_name'] == player_name]['fumble_lost'].sum()
-    cw_pass_td = current_week_data[current_week_data['passer_player_name'] == player_name]['pass_touchdown'].sum()
-    cw_rush_td = current_week_data[current_week_data['rusher_player_name'] == player_name]['rush_touchdown'].sum()
-    cw_rec_td = current_week_data[current_week_data['receiver_player_name'] == player_name]['pass_touchdown'].sum()
-    cw_two_pt_pass = (current_week_data[current_week_data['passer_player_name'] == player_name]['two_point_conv_result'] == 'success').sum()
-    cw_two_pt_rush = (current_week_data[current_week_data['rusher_player_name'] == player_name]['two_point_conv_result'] == 'success').sum()
-    cw_two_pt_rec = (current_week_data[current_week_data['receiver_player_name'] == player_name]['two_point_conv_result'] == 'success').sum()
+    # === Season averages (prior weeks) ===
+    season_raw      = extract_player_stats_for_plays(prior_plays, player_name)
+    total_fp        = calculate_fantasy_points(**season_raw)
+    average_fp      = total_fp / games_played
 
-    week_fantasy_points = (
-        (cw_passing_yards * 0.04) +
-        (cw_rushing_yards * 0.1) +
-        (cw_receiving_yards * 0.1) -
-        (cw_interceptions * 2) +
-        (cw_pass_td * 4) +
-        (cw_rush_td * 6) +
-        (cw_rec_td * 6) -
-        (cw_fumbles_lost * 2) +
-        (cw_receptions) +
-        (cw_two_pt_pass * 2) +
-        (cw_two_pt_rec * 2) +
-        (cw_two_pt_rush * 2)
+    average_p_yards   = season_raw['passing_yards']   / games_played
+    average_r_yards   = season_raw['rushing_yards']   / games_played
+    average_rec_yards = season_raw['receiving_yards'] / games_played
+
+    # === Boom / bust metrics ===
+    weeks        = sorted(prior_plays['week'].unique())
+    boom_bust    = _calculate_boom_bust_metrics(prior_plays, player_name, average_fp, weeks)
+
+    # === Recent form ===
+    three_week_avg      = _calculate_recent_average(prior_plays, player_name, weeks)
+    last_three_weeks_diff = three_week_avg - average_fp
+
+    # === Red zone usage ===
+    red_zone_plays   = prior_plays[prior_plays['yardline_100'] <= 20]
+    red_zone_targets = red_zone_plays[red_zone_plays['receiver_player_name'] == player_name].shape[0]
+    red_zone_carries = red_zone_plays[red_zone_plays['rusher_player_name']   == player_name].shape[0]
+
+    # === Completion percentage ===
+    pass_attempts      = prior_plays[
+        (prior_plays['passer_player_name'] == player_name) &
+        (prior_plays['play_type']          == 'pass')
+    ]
+    completions        = pass_attempts[pass_attempts['complete_pass'] == 1].shape[0]
+    completion_pct     = completions / pass_attempts.shape[0] if pass_attempts.shape[0] > 0 else 0.0
+
+    # === Positional ranking within team ===
+    position_ranking = get_player_position_rank(
+        team_name, player_name, position, all_stats, week_input
     )
-
-    # Calculate season averages
-    total_P_Yards = pbp[pbp['passer_player_name'] == player_name]['passing_yards'].sum()
-    total_R_Yards = pbp[pbp['rusher_player_name'] == player_name]['rushing_yards'].sum()
     
-    average_P_Yards = total_P_Yards / games_played
-    average_R_Yards = total_R_Yards / games_played
-
-    receptions = len(pbp[(pbp['receiver_player_name'] == player_name) & (pbp['complete_pass'] == 1)])
-    receiving_yards = pbp[pbp['receiver_player_name'] == player_name]['receiving_yards'].sum()
-    average_rec_yards = receiving_yards / games_played
-
-    interceptions = pbp[pbp['passer_player_name'] == player_name]['interception'].sum()
-    fumbles_lost = pbp[pbp['fumbled_1_player_name'] == player_name]['fumble_lost'].sum()
-    pTd = pbp[pbp['passer_player_name'] == player_name]['pass_touchdown'].sum()
-    rtd = pbp[pbp['rusher_player_name'] == player_name]['rush_touchdown'].sum()
-    recTd = pbp[pbp['receiver_player_name'] == player_name]['pass_touchdown'].sum()
-
-    two_pt_pass = (pbp[pbp['passer_player_name'] == player_name]['two_point_conv_result'] == 'success').sum()
-    two_pt_rush = (pbp[pbp['rusher_player_name'] == player_name]['two_point_conv_result'] == 'success').sum()
-    two_pt_rec = (pbp[pbp['receiver_player_name'] == player_name]['two_point_conv_result'] == 'success').sum()
-
-    total_F_Points = (
-        (total_P_Yards * .04) +
-        (total_R_Yards * .1) +
-        (receiving_yards * .1) -
-        (interceptions * 2) +
-        (pTd * 4) +
-        (rtd * 6) +
-        (recTd * 6) -
-        (fumbles_lost * 2) +
-        (receptions) +
-        (two_pt_pass * 2) +
-        (two_pt_rec * 2) +
-        (two_pt_rush * 2)
-    )
-    average_F_Points = total_F_Points / games_played
-
-    rz_targets_df = pbp[
-        (pbp['receiver_player_name'] == player_name) &
-        (pbp['yardline_100'] <= 20)
-    ]
-    red_zone_targets = rz_targets_df.shape[0]
-
-    rz_carries_df = pbp[
-        (pbp['rusher_player_name'] == player_name) &
-        (pbp['yardline_100'] <= 20)
-    ]
-    red_zone_carries = rz_carries_df.shape[0]
-
-    # Unique weeks list
-    weeks = sorted(pbp['week'].unique())
-
-    # 2. Passing Completion Percentage
-    pass_attempts_df = pbp[
-        (pbp['passer_player_name'] == player_name) &
-        (pbp['play_type'] == 'pass')
-    ]
-
-    completions_df = pass_attempts_df[pass_attempts_df['complete_pass'] == 1]
-
-    total_pass_attempts = pass_attempts_df.shape[0]
-    completions = completions_df.shape[0]
-
-    # Calculate percentage
-    completion_percentage = (completions / total_pass_attempts) if total_pass_attempts > 0 else 0
-
-    positive_difference = []
-    negative_difference = []
-    boom_games = 0
-    bust_games = 0
-    
-    for week_num in weeks:
-        week_data = pbp[pbp['week'] == week_num]
-        
-        total_P_YardsW = week_data[week_data['passer_player_name'] == player_name]['passing_yards'].sum()
-        total_R_YardsW = week_data[week_data['rusher_player_name'] == player_name]['rushing_yards'].sum()
-        receiving_yardsW = week_data[week_data['receiver_player_name'] == player_name]['receiving_yards'].sum()
-        receptionsW = len(week_data[(week_data['receiver_player_name'] == player_name) & (week_data['complete_pass'] == 1)])
-        interceptionsW = week_data[week_data['passer_player_name'] == player_name]['interception'].sum()
-        fumbles_lostW = week_data[week_data['fumbled_1_player_name'] == player_name]['fumble_lost'].sum()
-        pTdW = week_data[week_data['passer_player_name'] == player_name]['pass_touchdown'].sum()
-        rtdW = week_data[week_data['rusher_player_name'] == player_name]['rush_touchdown'].sum()
-        recTdW = week_data[week_data['receiver_player_name'] == player_name]['pass_touchdown'].sum()
-        
-        two_pt_passW = (week_data[week_data['passer_player_name'] == player_name]['two_point_conv_result'] == 'success').sum()
-        two_pt_rushW = (week_data[week_data['rusher_player_name'] == player_name]['two_point_conv_result'] == 'success').sum()
-        two_pt_recW = (week_data[week_data['receiver_player_name'] == player_name]['two_point_conv_result'] == 'success').sum()
-
-        total_F_Points_W = (total_P_YardsW * .04) + (total_R_YardsW * .1) + (receiving_yardsW * .1) - (interceptionsW * 2) + (pTdW * 4) + (rtdW * 6) + (recTdW * 6) - (fumbles_lostW * 2) + (receptionsW) + (two_pt_passW * 2) + (two_pt_recW * 2) + (two_pt_rushW * 2)
-        
-        # Numerical difference between week points and the average
-        week_diff_amount = (total_F_Points_W - average_F_Points)
-
-        if week_diff_amount > 6:
-            boom_games += 1
-            positive_difference.append(week_diff_amount)
-        elif week_diff_amount < -6:
-            bust_games += 1
-            negative_difference.append(week_diff_amount)
-
-    if boom_games > 0 and len(positive_difference) > 0:
-        # Average amount that does over the average
-        boom_points = (sum(positive_difference) / len(positive_difference))
-    else:
-        boom_points = 0
-
-    if bust_games > 0 and len(negative_difference) > 0:
-        bust_points = (sum(negative_difference) / len(negative_difference))
-    else:
-        bust_points = 0
-
-    # Last 3 weeks
-    last_three_weeks = 0
-    weeks_counted = 0
-    for week in weeks[-3:]:
-        week_data = pbp[pbp['week'] == week]
-
-        total_P_YardsW = week_data[week_data['passer_player_name'] == player_name]['passing_yards'].sum()
-        total_R_YardsW = week_data[week_data['rusher_player_name'] == player_name]['rushing_yards'].sum()
-        receiving_yardsW = week_data[week_data['receiver_player_name'] == player_name]['receiving_yards'].sum()
-        receptionsW = len(week_data[(week_data['receiver_player_name'] == player_name) & (week_data['complete_pass'] == 1)])
-        interceptionsW = week_data[week_data['passer_player_name'] == player_name]['interception'].sum()
-        fumbles_lostW = week_data[week_data['fumbled_1_player_name'] == player_name]['fumble_lost'].sum()
-        pTdW = week_data[week_data['passer_player_name'] == player_name]['pass_touchdown'].sum()
-        rtdW = week_data[week_data['rusher_player_name'] == player_name]['rush_touchdown'].sum()
-        recTdW = week_data[week_data['receiver_player_name'] == player_name]['pass_touchdown'].sum()
-        
-        two_pt_passW = (week_data[week_data['passer_player_name'] == player_name]['two_point_conv_result'] == 'success').sum()
-        two_pt_rushW = (week_data[week_data['rusher_player_name'] == player_name]['two_point_conv_result'] == 'success').sum()
-        two_pt_recW = (week_data[week_data['receiver_player_name'] == player_name]['two_point_conv_result'] == 'success').sum()
-
-        total_F_Points_W = (total_P_YardsW * .04) + (total_R_YardsW * .1) + (receiving_yardsW * .1) - (interceptionsW * 2) + (pTdW * 4) + (rtdW * 6) + (recTdW * 6) - (fumbles_lostW * 2) + (receptionsW) + (two_pt_passW * 2) + (two_pt_recW * 2) + (two_pt_rushW * 2)
-        last_three_weeks += total_F_Points_W
-        weeks_counted += 1
-
-    three_week_average = last_three_weeks / weeks_counted if weeks_counted > 0 else average_F_Points
-    
-    # Player position
-    position = assign_position({'average_passing_yards': average_P_Yards,
-                                'average_rushing_yards': average_R_Yards,
-                                'average_recieving_yards': average_rec_yards})
-
-    # Team position ranking
-    position_ranking = get_player_position_rank(team_name, player_name, position, all_stats, week_input)
-
+    # === External percentage features ===
     percentages = get_week_percentage(team_name, player_name, all_stats, week_input)
 
+    # === Assemble feature row ===
     player_stats = [{
-        'week': week_input,
-        'team_name': team_name,
-        'player_name': player_name,
-        'receptions_avg': receptions / games_played,
-        'average_passing_yards': average_P_Yards,
-        'average_rushing_yards': average_R_Yards,
+        'week'                 : week_input,
+        'team_name'            : team_name,
+        'player_name'          : player_name,
+        'position'             : position,
+        'position_ranking'     : position_ranking,
+        'average_passing_yards': average_p_yards,
+        'average_rushing_yards': average_r_yards,
         'average_recieving_yards': average_rec_yards,
-        'passing_tds_avg': pTd / games_played,
-        'rushing_tds_avg': rtd / games_played,
-        'recieving_tds_avg': recTd / games_played,
-        'average_fantasy_points': total_F_Points / games_played,
-        'week_fantasy_points': week_fantasy_points,
-        'bust_percent': bust_games / games_played,
-        'bust_points_average': bust_points,
-        'boom_percent': boom_games / games_played,
-        'boom_points_average': boom_points,
-        'last_three_weeks_diff': three_week_average - average_F_Points,
-        'redzone_carries': red_zone_carries,
-        'redzone_targets': red_zone_targets,
-        'completion_percentage': completion_percentage,
-        'position_ranking': position_ranking,
-        'position': position
+        'receptions_avg'       : season_raw['receptions']    / games_played,
+        'passing_tds_avg'      : season_raw['pass_td']       / games_played,
+        'rushing_tds_avg'      : season_raw['rush_td']       / games_played,
+        'recieving_tds_avg'    : season_raw['rec_td']        / games_played,
+        'average_fantasy_points': average_fp,
+        'week_fantasy_points'  : week_fantasy_points,
+        'bust_percent'         : boom_bust['bust_games']  / games_played,
+        'bust_points_average'  : boom_bust['bust_points'],
+        'boom_percent'         : boom_bust['boom_games']  / games_played,
+        'boom_points_average'  : boom_bust['boom_points'],
+        'last_three_weeks_diff': last_three_weeks_diff,
+        'redzone_carries'      : red_zone_carries,
+        'redzone_targets'      : red_zone_targets,
+        'completion_percentage': completion_pct,
     }]
 
-    player_stats_dataframe = pd.DataFrame(player_stats)
-
-    return pd.merge(player_stats_dataframe, percentages, how="left")
+    return pd.merge(pd.DataFrame(player_stats), percentages, how='left')
 
 
-def get_player_team(all_data, player_name):
-    # Find plays where the player was involved
+# ============================================================
+# PLAYER / TEAM LOOKUP UTILITIES
+# ============================================================
+
+def get_player_team(all_data: pd.DataFrame, player_name: str) -> str | None:
+    """
+    Returns the offensive team abbreviation a player most frequently
+    appeared for across all available play-by-play data.
+    """
     player_plays = all_data[
-        (all_data['passer_player_name'] == player_name) |
-        (all_data['rusher_player_name'] == player_name) |
+        (all_data['passer_player_name']   == player_name) |
+        (all_data['rusher_player_name']   == player_name) |
         (all_data['receiver_player_name'] == player_name)
     ]
-    
-    # Get the player's team (posteam - team on offense when player was involved)
-    player_team = player_plays['posteam'].mode()[0] if len(player_plays) > 0 else None
-    
-    return player_team
+
+    if player_plays.empty:
+        return None
+
+    return player_plays['posteam'].mode()[0]
 
 
-def get_opponent_team(all_data, offensive_team_name, week):
-    # Filter data for the specific week and offensive team
+def get_opponent_team(
+    all_data: pd.DataFrame,
+    offensive_team_name: str,
+    week: int
+) -> str | None:
+    """
+    Returns the defensive team abbreviation that faced the given
+    offensive team in the specified week.
+    """
     week_data = all_data[
-        (all_data['week'] == week) &
+        (all_data['week']    == week) &
         (all_data['posteam'] == offensive_team_name)
     ]
-    
-    # Get the opponent team (defteam when team was on offense)
-    opponent_team = week_data['defteam'].mode()[0] if len(week_data) > 0 else None
-    
-    return opponent_team
+
+    if week_data.empty:
+        return None
+
+    return week_data['defteam'].mode()[0]
 
 
-def did_player_play_this_week(player_data, player_name, week):
-    week_data = player_data[player_data['week'] == week]
-    
-    # Check if player actually has any plays recorded this week
-    played = (
-        week_data[week_data['passer_player_name'] == player_name]['passing_yards'].sum() > 0 or
-        week_data[week_data['rusher_player_name'] == player_name]['rushing_yards'].sum() > 0 or
-        week_data[week_data['receiver_player_name'] == player_name]['receiving_yards'].sum() > 0 or
-        len(week_data[week_data['receiver_player_name'] == player_name]) > 0
+def did_player_play_this_week(
+    player_data: pd.DataFrame,
+    player_name: str,
+    week: int
+) -> bool:
+    """
+    Returns True if the player recorded any statistical activity
+    in the given week. Used to filter out bye weeks and inactive
+    players from the training dataset.
+    """
+    week_plays = player_data[player_data['week'] == week]
+
+    return (
+        week_plays[week_plays['passer_player_name']   == player_name]['passing_yards'].sum()  > 0 or
+        week_plays[week_plays['rusher_player_name']   == player_name]['rushing_yards'].sum()  > 0 or
+        week_plays[week_plays['receiver_player_name'] == player_name]['receiving_yards'].sum() > 0 or
+        not week_plays[week_plays['receiver_player_name'] == player_name].empty
     )
-
-    return played
