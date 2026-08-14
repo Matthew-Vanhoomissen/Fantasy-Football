@@ -8,18 +8,18 @@ def get_offensive_week_data(
     team_name: str,
     team_data: pd.DataFrame,
     week_input: int
-) -> pd.DataFrame | None: 
+) -> pd.DataFrame | None:
     """
-    Builds a single row of model features for an offesnive in a given week.
+    Builds a single row of model features for an offense in a given week.
     All features use strictly prior week data to prevent leakage.
     Returns None if the team has fewer than 3 games played.
 
     Args:
-            team_name   : NFL team abbreviation (e.g. 'MIA')
-            team_data : Play-by-play data for the team
-            week_input  : Current week being predicted
+        team_name   : NFL team abbreviation (e.g. 'MIA')
+        team_data   : Play-by-play data for the team
+        week_input  : Current week being predicted
     """
-    # all offensive plays
+    # === Offensive plays ===
     offensive_plays = team_data[
         (team_data['posteam'] == team_name) &
         (team_data['play_type'].isin(['pass', 'run'])) &

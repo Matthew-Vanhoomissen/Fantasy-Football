@@ -1,6 +1,5 @@
 import pandas as pd
 from .target_percentage import get_week_percentage
-from scripts.csv_manipulation.add_position_column import assign_position
 from .finding_team_data import get_player_position_rank
 
 

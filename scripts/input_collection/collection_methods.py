@@ -1,7 +1,17 @@
 import pandas as pd
 
+# ============================================================
+# FILTERED DATAFRAME BUILDER
+# ============================================================
+def create_csvs_offense(
+    pbp: pd.DataFrame,
+    player_name: str,
+    offensive_team_name: str
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """
+    Given historic play-by-play data, filter DataFrame based on team and player name.
 
-def create_csvs_offense(pbp, player_name, offensive_team_name):
+    """
 
     # filter the dataframe
     offensive_team_data = pbp[(pbp['home_team'] == offensive_team_name) | (pbp['away_team'] == offensive_team_name)]
@@ -16,15 +26,31 @@ def create_csvs_offense(pbp, player_name, offensive_team_name):
     return offensive_team_data, player_data
 
 
-def create_csvs_defense(pbp, defense_team_name):
+def create_csvs_defense(
+    pbp: pd.DataFrame,
+    defense_team_name: str
+) -> pd.DataFrame:
+    """
+    Given historic play-by-play data, filter DataFrame based on defensive team name.
 
-    # filter for defense
+    """
+
     defensive_team_data = pbp[(pbp['home_team'] == defense_team_name) | (pbp['away_team'] == defense_team_name)]
 
     return defensive_team_data
 
+# ============================================================
+# FORMATTING HELPER METHODS
+# ============================================================
+def return_opponent(
+    team: str,
+    week: int,
+    season: int
+) -> None | str:
+    """
+    Parses future schedule to give accurate matchups for that week
 
-def return_opponent(team, week, season):
+    """
     schedule = pd.read_csv(f"data/schedule_{season}.csv")
 
     schedule = schedule[schedule["week"] == week]
@@ -39,7 +65,16 @@ def return_opponent(team, week, season):
     return None
 
 
-def convert(name, file):
+def convert(
+    name: str,         # Name of player
+    file: pd.DataFrame # Stored name file
+) -> None | str:
+    """
+    Critical formatting method that converts full name to shortened name that
+    appears in play-by-play data. The data uses alphabetical priority for players
+    with the same last name and first initial. Utilizes an override dataset for 
+    irregular conversions
+    """
     SUFFIXES = {"jr", "sr", "ii", "iii", "iv", "v"}
     override = pd.read_csv("data/override.csv", low_memory=False)
 
@@ -66,16 +101,16 @@ def convert(name, file):
         cleaned_last = cleaned_last + part
     
     player = file[(file['first_name'] == first_name) & (file['last_name'] == last_name)]
+    team = player['team']
+    if team == "LAR":
+        team = "LA"
+    elif team == "WSH":
+        team = "WAS"
 
     match = override[override['player_name'] == name]
     if not match.empty:
         abbr = match.iloc[0]['abbreviation']
         player = player.iloc[0]
-        team = player['team']
-        if team == "LAR":
-            team = "LA"
-        elif team == "WSH":
-            team = "WAS"
         return abbr, team, player['position']
 
     if player.empty:
@@ -112,10 +147,5 @@ def convert(name, file):
                 chars_needed = max(chars_needed, temp_chars)
             
             abbr = first_name[:chars_needed] + "." + cleaned_last
-        team = player['team']
-        if team == "LAR":
-            team = "LA"
-        elif team == "WSH":
-            team = "WAS"
         return abbr, team, player['position']
     
