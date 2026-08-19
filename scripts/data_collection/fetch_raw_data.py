@@ -2,7 +2,14 @@ import pandas as pd
 import os
 
 
-def get_season_data(season):
+def get_season_data(
+    season: int
+) -> None:
+    """
+    Pulls every play from the input season which is then parsed and cleaned to provide the
+    XGBoost model with input parameters for calculation.
+
+    """
     # url to get csv for current season
     url = f"https://github.com/nflverse/nflverse-data/releases/download/pbp/play_by_play_{season}.csv.gz"
 

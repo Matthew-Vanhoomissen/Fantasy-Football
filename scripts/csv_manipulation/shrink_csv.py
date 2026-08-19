@@ -1,7 +1,14 @@
 import pandas as pd 
 
 
-def edit_data(year):
+def edit_data(
+    year: int
+) -> None:
+    """
+    Reduces large season long data file into the necessary parameters for
+    calculation.
+
+    """
     NEEDED_COLUMNS = [
         'week',
         'posteam',

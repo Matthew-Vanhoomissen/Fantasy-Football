@@ -5,7 +5,7 @@ import pickle
 from .defensive_team_data import get_defensive_week_data
 from .finding_team_data import get_offensive_week_data
 from .player_stats_data import get_player_week_data
-from .collection_methods import create_csvs_defense, create_csvs_offense
+from .collection_methods import create_csvs_defense, create_csvs_offense, convert, return_opponent
 
 # For weekly data collection
 from scripts.data_collection.fetch_raw_data import get_season_data
@@ -13,11 +13,33 @@ from scripts.data_collection.get_player_names import get_names
 from scripts.csv_manipulation.edit_names import edit_player_names
 from scripts.csv_manipulation.shrink_csv import edit_data
 
+# ============================================================
+# MODEL INPUT REQUEST COLLECTION
+# ============================================================
 
 CURRENT_SEASON = 2026
 
+def get_player_input(
+    player_name: str,
+    offensive_team_name: str,
+    defensive_team_name: str,
+    all_data: pd.DataFrame,
+    week: int,
+    position: int
+) -> tuple[None, None, str] | tuple[float, dict, str]:
+    """
+    Collects player, offensive and defensive team data based on requested players and
+    input week through historic play-by-play data. Data is input into XGBoost model to
+    retrieve predicted deviation from average to return predicted points.
 
-def get_player_input(player_name, offensive_team_name, defensive_team_name, all_data, week, position):
+    Args:
+        player_name           : Abbreviated player name (e.g. 'T.Hill')
+        offensive_team_name   : NFL team abbreviation (e.g. 'MIA')
+        defensive_team_name   : NFL team abbreviation (e.g. 'BAL')
+        all_data              : Fully loaded play-by-play data for current season
+        week                  : Current week being predicted
+        position              : Encoded position (0=QB, 1=RB, 2=WR/TE, 3=FLEX, -1=Unknown)
+    """
    
     defensive_team_data = create_csvs_defense(all_data, defensive_team_name)
     offensive_team_data, player_data = create_csvs_offense(all_data, player_name, offensive_team_name)
@@ -26,8 +48,6 @@ def get_player_input(player_name, offensive_team_name, defensive_team_name, all_
     offensive_stats = get_offensive_week_data(offensive_team_name, offensive_team_data, week)
     player_stats = get_player_week_data(player_name, offensive_team_name, player_data, all_data, week, position)
 
-    # TODO This will return null during biweek because it can't find opponent. Make another method
-    #      that can be used by the frontend
     if defensive_stats is None:
         return None, None, def_result
 
@@ -91,23 +111,8 @@ def get_prediction(player1_name, player2_name, week, name_file, all_data_current
         return None, None, None, "NPF"
 
     # Assign position as number
-    if pos1 == "QB":
-        pos1 = 0
-    elif pos1 == "RB" or pos1 == "FB":
-        pos1 = 1
-    elif pos1 == "WR" or pos1 == "TE":
-        pos1 = 2
-    else:
-        pos1 = -1
-
-    if pos2 == "QB":
-        pos2 = 0
-    elif pos2 == "RB" or pos2 == "FB":
-        pos2 = 1
-    elif pos2 == "WR" or pos2 == "TE":
-        pos2 = 2
-    else:
-        pos2 = -1
+    pos1 = position_converter(pos1)
+    pos2 = position_converter(pos2)
 
     print(p1_t)
     print(p1)
@@ -152,98 +157,15 @@ def get_prediction(player1_name, player2_name, week, name_file, all_data_current
     return {"winner": winner}, display1, display2, result
 
 
-def convert(name, file, override):
-    SUFFIXES = {"jr", "sr", "ii", "iii", "iv", "v"}
-
-    full_name = name.split(" ", 1)
-    if len(full_name) != 2:
-        return None, None, None
-    
-    last_name = full_name[1]
-    first_name = full_name[0]
-    first_initial = first_name[0]
-
-    last_parts_raw = last_name.replace(".", " ").split()
-    last_parts = []
-    for part in last_parts_raw:
-        if part.lower() not in SUFFIXES:
-            if part == "St ":
-                last_parts.append(part + ".")
-            else:
-                last_parts.append(part)
-    
-    cleaned_last = ""
-    for part in last_parts:
-        cleaned_last = cleaned_last + part
-    
-    player = file[(file['first_name'] == first_name) & (file['last_name'] == last_name)]
-
-    match = override[override['player_name'] == name]
-    if not match.empty:
-        abbr = match.iloc[0]['abbreviation']
-        player = player.iloc[0]
-        team = player['team']
-        if team == "LAR":
-            team = "LA"
-        elif team == "WSH":
-            team = "WAS"
-        return abbr, team, player['position']
-
-    if player.empty:
-        return None, None, None
+def position_converter(position):
+    if position == "QB":
+        return 0
+    elif position == "RB" or position == "FB":
+        return 1
+    elif position == "WR" or position == "TE":
+        return 2
     else:
-        player = player.iloc[0]
-        
-        # Find all players with the same last name and same first initial
-        same_last_and_initial = file[
-            (file['last_name'] == last_name) & 
-            (file['first_name'].str[0] == first_initial)
-        ].sort_values('first_name')
-        
-        if len(same_last_and_initial) == 1:
-            # Only one player with this last name and first initial
-            abbr = first_name[0] + "." + cleaned_last
-        else:
-            # Multiple players with same initial
-            all_first_names = same_last_and_initial['first_name'].tolist()
-            
-            # Find this player's position in alphabetical order
-            player_index = all_first_names.index(first_name)
-            
-            # Check only players that come BEFORE this one alphabetically
-            chars_needed = 1
-            for i in range(player_index):
-                other_first = all_first_names[i]
-                # Find how many chars needed to differentiate from this earlier player
-                temp_chars = 1
-                while temp_chars <= min(len(first_name), len(other_first)):
-                    if first_name[:temp_chars] != other_first[:temp_chars]:
-                        break
-                    temp_chars += 1
-                chars_needed = max(chars_needed, temp_chars)
-            
-            abbr = first_name[:chars_needed] + "." + cleaned_last
-        team = player['team']
-        if team == "LAR":
-            team = "LA"
-        elif team == "WSH":
-            team = "WAS"
-        return abbr, team, player['position']
-
-
-def return_opponent(team, week, season):
-    schedule = pd.read_csv(f"data/schedule_{season}.csv")
-
-    schedule = schedule[schedule["week"] == week]
-
-    away = schedule[schedule['away_team'] == team]
-    if not away.empty:
-        return (away.iloc[0])['home_team']
-    home = schedule[schedule['home_team'] == team]
-    if not home.empty:
-        return (home.iloc[0])['away_team']
-
-    return None
+        return -1
 
 
 def weekly_data_collection():

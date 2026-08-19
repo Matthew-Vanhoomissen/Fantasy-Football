@@ -1,7 +1,13 @@
 import pandas as pd 
 
 
-def edit_player_names():
+def edit_player_names() -> None:
+    """
+    Filters raw data from BALLDONTLIE API into necessary values
+    to be utilized in the application. Filters for offensive players
+    and corrects team name mismatches.
+
+    """
     players = pd.read_csv("data/nfl_players.csv")
 
     new_dataframe = []

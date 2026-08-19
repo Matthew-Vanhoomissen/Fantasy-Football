@@ -68,7 +68,7 @@ def return_opponent(
 def convert(
     name: str,         # Name of player
     file: pd.DataFrame # Stored name file
-) -> None | str:
+) -> tuple[None, None, None] | tuple[str, str, str]:
     """
     Critical formatting method that converts full name to shortened name that
     appears in play-by-play data. The data uses alphabetical priority for players
@@ -78,14 +78,12 @@ def convert(
     SUFFIXES = {"jr", "sr", "ii", "iii", "iv", "v"}
     override = pd.read_csv("data/override.csv", low_memory=False)
 
-
     full_name = name.split(" ", 1)
     if len(full_name) != 2:
-        return None
+        return None, None, None
     
     last_name = full_name[1]
     first_name = full_name[0]
-    first_initial = first_name[0]
 
     last_parts_raw = last_name.replace(".", " ").split()
     last_parts = []
@@ -114,7 +112,7 @@ def convert(
         return abbr, team, player['position']
 
     if player.empty:
-        return None
+        return None, None, None
     else:
         player = player.iloc[0]
         

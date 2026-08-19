@@ -18,7 +18,10 @@ SAVE_INTERVAL = 10
 headers = {"Authorization": API_KEY}
 
 
-def save_players(players_data, filename):
+def save_players(
+    players_data: list,
+    filename: str
+) -> None:
     """Save players to CSV file"""
     with open(filename, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(
@@ -30,7 +33,12 @@ def save_players(players_data, filename):
     print(f"💾 Saved {len(players_data)} players to {filename}")
 
 
-def get_names():
+def get_names() -> None:
+    """
+    Pulls every player to have participated in the last few seasons of the NFL. The player names
+    include first names which differ from player names from the nflFastR with only first initial.
+
+    """
     players_data = []
     cursor = None
     page = 0
@@ -41,7 +49,7 @@ def get_names():
         r = requests.get(BASE_URL, headers=headers, params=params)
 
         if r.status_code == 429:
-            print("⏳ Rate limited, waiting 60s...")
+            print("Rate limited, waiting 60s...")
             time.sleep(60)
             continue
 
@@ -66,7 +74,7 @@ def get_names():
 
         cursor = data["meta"]["next_cursor"]
         if cursor is None:
-            print("✅ Reached end of data")
+            print("Reached end of data")
             break
 
         time.sleep(REQUEST_DELAY)
