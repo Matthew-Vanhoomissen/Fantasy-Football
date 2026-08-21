@@ -2,10 +2,13 @@ from itertools import combinations
 import pandas as pd
 
 
-def evaluate_pairwise_accuracy(output_df, min_predictions=True):
+def evaluate_pairwise_accuracy(
+    output_df: pd.DataFrame,
+) -> pd.DataFrame:
     """
     For each week, compare every pair of players and check if the model
     correctly predicted which one would score more.
+
     """
     # Only use rows where we have predictions
     predicted = output_df.dropna(subset=['predicted_fantasy_points']).copy()
@@ -73,10 +76,13 @@ def evaluate_pairwise_accuracy(output_df, min_predictions=True):
     return accuracy_df
 
 
-def evaluate_positional_pairwise(output_df):
+def evaluate_positional_pairwise(
+    output_df: pd.DataFrame
+) -> pd.DataFrame:
     """
     Same as pairwise but only compares players of the same position.
     More representative of actual fantasy decisions.
+
     """
     predicted = output_df.dropna(subset=['predicted_fantasy_points']).copy()
 
@@ -128,40 +134,45 @@ def evaluate_positional_pairwise(output_df):
     return pd.DataFrame(results)
 
 
-output = pd.read_csv("data/training_dataset/predictions_output.csv", low_memory=False)
+def main():
+    output = pd.read_csv("data/training_dataset/predictions_output.csv", low_memory=False)
 
-print("\n=== PAIRWISE RANKING ACCURACY ===")
-pairwise_df = evaluate_pairwise_accuracy(output)
+    print("\n=== PAIRWISE RANKING ACCURACY ===")
+    pairwise_df = evaluate_pairwise_accuracy(output)
 
-print(f"Weeks evaluated: {len(pairwise_df)}")
-print(f"Total comparisons: {pairwise_df['total'].sum():,}")
-print(f"Overall accuracy: {pairwise_df['correct'].sum() / pairwise_df['total'].sum():.4f}")
-print(f"Close pairing accuracy: {pairwise_df['close_avg_correct'].sum() / pairwise_df['close_avg_total'].sum():.4f}")
-print(f"Mean weekly accuracy: {pairwise_df['accuracy'].mean():.4f}")
-print(f"Std weekly accuracy:  {pairwise_df['accuracy'].std():.4f}")
-print(f"Worst week:  S{pairwise_df.loc[pairwise_df['accuracy'].idxmin(), 'season']} "
-      f"W{pairwise_df.loc[pairwise_df['accuracy'].idxmin(), 'week']} "
-      f"→ {pairwise_df['accuracy'].min():.4f}")
-print(f"Best week:   S{pairwise_df.loc[pairwise_df['accuracy'].idxmax(), 'season']} "
-      f"W{pairwise_df.loc[pairwise_df['accuracy'].idxmax(), 'week']} "
-      f"→ {pairwise_df['accuracy'].max():.4f}")
+    print(f"Weeks evaluated: {len(pairwise_df)}")
+    print(f"Total comparisons: {pairwise_df['total'].sum():,}")
+    print(f"Overall accuracy: {pairwise_df['correct'].sum() / pairwise_df['total'].sum():.4f}")
+    print(f"Close pairing accuracy: {pairwise_df['close_avg_correct'].sum() / pairwise_df['close_avg_total'].sum():.4f}")
+    print(f"Mean weekly accuracy: {pairwise_df['accuracy'].mean():.4f}")
+    print(f"Std weekly accuracy:  {pairwise_df['accuracy'].std():.4f}")
+    print(f"Worst week:  S{pairwise_df.loc[pairwise_df['accuracy'].idxmin(), 'season']} "
+        f"W{pairwise_df.loc[pairwise_df['accuracy'].idxmin(), 'week']} "
+        f"→ {pairwise_df['accuracy'].min():.4f}")
+    print(f"Best week:   S{pairwise_df.loc[pairwise_df['accuracy'].idxmax(), 'season']} "
+        f"W{pairwise_df.loc[pairwise_df['accuracy'].idxmax(), 'week']} "
+        f"→ {pairwise_df['accuracy'].max():.4f}")
 
-print("\n=== POSITIONAL PAIRWISE ACCURACY ===")
-positional_df = evaluate_positional_pairwise(output)
+    print("\n=== POSITIONAL PAIRWISE ACCURACY ===")
+    positional_df = evaluate_positional_pairwise(output)
 
-positional_summary = positional_df.groupby('position').apply(
-    lambda g: pd.Series({
-        'total_comparisons': g['total'].sum(),
-        'total_correct': g['correct'].sum(),
-        'overall_accuracy': g['correct'].sum() / g['total'].sum(),
-        'mean_weekly_accuracy': g['accuracy'].mean(),
-        'std_weekly_accuracy': g['accuracy'].std()
-    }), include_groups=False
-).reset_index()
+    positional_summary = positional_df.groupby('position').apply(
+        lambda g: pd.Series({
+            'total_comparisons': g['total'].sum(),
+            'total_correct': g['correct'].sum(),
+            'overall_accuracy': g['correct'].sum() / g['total'].sum(),
+            'mean_weekly_accuracy': g['accuracy'].mean(),
+            'std_weekly_accuracy': g['accuracy'].std()
+        }), include_groups=False
+    ).reset_index()
 
-print(positional_summary.to_string(index=False))
+    print(positional_summary.to_string(index=False))
 
-# Export weekly accuracy for inspection
-pairwise_df.to_csv("data/training_dataset/pairwise_accuracy.csv", index=False)
-positional_df.to_csv("data/training_dataset/positional_accuracy.csv", index=False)
-print("\nExported pairwise accuracy CSVs")
+    # Export weekly accuracy for inspection
+    pairwise_df.to_csv("data/training_dataset/pairwise_accuracy.csv", index=False)
+    positional_df.to_csv("data/training_dataset/positional_accuracy.csv", index=False)
+    print("\nExported pairwise accuracy CSVs")
+
+
+if __name__ == "__main__":
+    main()
