@@ -8,13 +8,13 @@ import pandas as pd
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 app = Flask(__name__)
-# CORS(app, origins=[
-#     "http://localhost:3000",
-#     "https://fantasy-football-7w2a.vercel.app"
-# ])
 CORS(app, origins=[
     "http://localhost:3000",
+    "https://fantasy-football-7w2a.vercel.app"
 ])
+# CORS(app, origins=[
+#     "http://localhost:3000",
+# ])
 
 CURRENT_SEASON = 2025
 
