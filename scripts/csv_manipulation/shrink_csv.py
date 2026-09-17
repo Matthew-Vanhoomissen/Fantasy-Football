@@ -1,0 +1,60 @@
+import pandas as pd 
+
+
+def edit_data(
+    year: int
+) -> None:
+    """
+    Reduces large season long data file into the necessary parameters for
+    calculation.
+
+    """
+    NEEDED_COLUMNS = [
+        'week',
+        'posteam',
+        'defteam',
+        'down',
+        'passer_player_name',
+        'rusher_player_name',
+        'receiver_player_name',
+        'fumbled_1_player_name',
+        'play_type',
+        'kickoff_attempt',
+        'extra_point_attempt',
+        'qb_kneel',
+        'qb_spike',
+        'penalty',
+        'two_point_attempt',
+        'pass_attempt',
+        'rush_attempt',
+        'sack',
+        'qb_scramble',
+        'passing_yards',
+        'rushing_yards',
+        'receiving_yards',
+        'yards_gained',
+        'complete_pass',
+        'interception',
+        'fumble_lost',
+        'pass_touchdown',
+        'rush_touchdown',
+        'two_point_conv_result',
+        'epa',
+        'td_team',
+        'touchdown',
+        'field_goal_result',
+        'extra_point_result',
+        'penalty_team',
+        'penalty_yards',
+        'home_team',
+        'away_team',
+        'yardline_100',
+        'side_of_field',
+        'third_down_converted',
+        'fourth_down_converted',
+        'result'
+    ]
+
+    all_data = pd.read_csv(f"data/play_by_play/play_by_play_202{year}.csv", low_memory=False, dtype={'week': 'int8', 'season': 'int16'}, usecols=NEEDED_COLUMNS)
+
+    all_data.to_csv(f"data/play_by_play/play_by_play_202{year}.csv", index=False)

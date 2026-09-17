@@ -1,6 +1,6 @@
 import pandas as pd 
-from make_csv import create_csvs_offense
-from name_formatter import convert
+from scripts.input_collection.collection_methods import create_csvs_offense
+from scripts.input_collection.collection_methods import convert
 
 
 def get_fantasy_sum(player_name, team, data):
