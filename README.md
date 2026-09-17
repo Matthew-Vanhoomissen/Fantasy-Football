@@ -74,11 +74,6 @@ Matchup Features:
 - total_usage (target % + carry %)
 - boom_bust_ratio
 
-Variance Features:
-- recent_volatility
-- boom_potential
-- bust_risk
-- variance_score
 ```
 
 ### Model
@@ -142,8 +137,7 @@ Compares two players and returns prediction.
 {
   "status": "success",
   "data": {
-    "recommended_player": 1,
-    "confidence": 67.8
+    "winner": 1,
   },
   "display1": {
     "average_fantasy_points": 24.5,

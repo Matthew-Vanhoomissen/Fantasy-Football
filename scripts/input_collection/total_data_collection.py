@@ -104,7 +104,20 @@ def get_player_input(
     return result.iloc[0], display_data.iloc[0].to_dict(), "success"
 
 
-def get_prediction(player1_name, player2_name, week, name_file, all_data_current, all_data_past, override_name_file):
+def get_prediction(
+    player1_name: str,
+    player2_name: str,
+    week: int,
+    name_file: pd.DataFrame,
+    all_data_current: pd.DataFrame,
+    all_data_past: pd.DataFrame,
+    override_name_file: pd.DataFrame
+) -> tuple[dict, dict, int]:
+    """
+    Collects and coverts all input names into data which is input into the model
+    for prediciton. Handles conversion and error handling and returns the result
+    to the backend app.py
+    """
     p1, p1_t, pos1 = convert(player1_name, name_file, override_name_file)
     p2, p2_t, pos2 = convert(player2_name, name_file, override_name_file)
     if p1 is None or p2 is None:
@@ -157,7 +170,12 @@ def get_prediction(player1_name, player2_name, week, name_file, all_data_current
     return {"winner": winner}, display1, display2, result
 
 
-def position_converter(position):
+def position_converter(
+    position: str
+) -> int:
+    """
+    Converts position string to integer code for model input
+    """
     if position == "QB":
         return 0
     elif position == "RB" or position == "FB":
