@@ -66,8 +66,9 @@ def return_opponent(
 
 
 def convert(
-    name: str,         # Name of player
-    file: pd.DataFrame # Stored name file
+    name: str,              # Name of player
+    file: pd.DataFrame,     # Stored name file
+    override: pd.DataFrame  # Override file
 ) -> tuple[None, None, None] | tuple[str, str, str]:
     """
     Critical formatting method that converts full name to shortened name that
@@ -76,7 +77,6 @@ def convert(
     irregular conversions
     """
     SUFFIXES = {"jr", "sr", "ii", "iii", "iv", "v"}
-    override = pd.read_csv("data/override.csv", low_memory=False)
 
     full_name = name.split(" ", 1)
     if len(full_name) != 2:
