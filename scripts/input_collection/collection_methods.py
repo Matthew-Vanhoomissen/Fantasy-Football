@@ -98,7 +98,7 @@ def convert(
     for part in last_parts:
         cleaned_last = cleaned_last + part
     
-    player = file[(file['first_name'] == first_name) & (file['last_name'] == last_name)]
+    player = file[(file['first_name'] == first_name) & (file['last_name'] == last_name)].iloc[0]
     team = player['team']
     if team == "LAR":
         team = "LA"
