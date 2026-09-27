@@ -1,6 +1,5 @@
 import pandas as pd
 from .target_percentage import get_week_percentage
-from .finding_team_data import get_player_position_rank
 
 
 # ============================================================
@@ -290,3 +289,103 @@ def did_player_play_this_week(
         week_plays[week_plays['receiver_player_name'] == player_name]['receiving_yards'].sum() > 0 or
         not week_plays[week_plays['receiver_player_name'] == player_name].empty
     )
+
+
+def get_player_position_rank(
+    team_name: str,
+    player_name: str,
+    position: int,
+    all_data: pd.DataFrame,
+    week_input: int
+) -> int | None:
+    """
+    Calculates the positional ranking of a player on a specific team to resolve
+    team importance.
+    """
+
+    # === Prior weeks only — no leakage ===
+    prior_plays = all_data[
+        ((all_data['home_team'] == team_name) | (all_data['away_team'] == team_name)) &
+        (all_data['week'] < week_input) & 
+        (all_data['posteam'] == team_name)
+    ]
+
+    # === Edge case lack of data ===
+    if prior_plays.empty:
+        return None
+
+    games_played_overall = prior_plays['week'].nunique()
+
+    if games_played_overall < 1:
+        return None
+
+    # === Obtain player list for player's team ===
+    all_players = pd.concat([
+        prior_plays['passer_player_name'],
+        prior_plays['rusher_player_name'],
+        prior_plays['receiver_player_name']
+    ]).dropna().unique()
+
+    # === Iterate through player list ===
+    player_averages = []
+    for player in all_players:
+        p_plays = prior_plays
+
+        p_passing_yards = p_plays[p_plays['passer_player_name'] == player]['passing_yards'].sum()
+        p_rushing_yards = p_plays[p_plays['rusher_player_name'] == player]['rushing_yards'].sum()
+        p_receiving_yards = p_plays[p_plays['receiver_player_name'] == player]['receiving_yards'].sum()
+
+        p_games = prior_plays[
+            (prior_plays['passer_player_name'] == player) |
+            (prior_plays['rusher_player_name'] == player) |
+            (prior_plays['receiver_player_name'] == player)
+        ]['week'].nunique()
+
+        if p_games == 0:
+            continue
+
+        total_fp = calculate_fantasy_points(extract_player_stats_for_plays(prior_plays, player))
+
+        avg_fp = total_fp / p_games
+
+        # === Percentage of yards in position ===
+        total_yards = p_passing_yards + p_rushing_yards + p_receiving_yards
+        if total_yards == 0:
+            p_position = -1
+        else:
+            pass_ratio = p_passing_yards / total_yards
+            rush_ratio = p_rushing_yards / total_yards
+            rec_ratio = p_receiving_yards / total_yards
+            dominance_threshold = 0.45
+
+            if pass_ratio >= dominance_threshold:
+                p_position = 0
+            elif rush_ratio >= dominance_threshold:
+                p_position = 1
+            elif rec_ratio >= dominance_threshold:
+                p_position = 2
+            else:
+                p_position = -1
+
+        # === Position filtering ===
+        if p_position == position:
+            player_averages.append({
+                'player_name': player,
+                'avg_fantasy_points': avg_fp
+            })
+
+    if not player_averages:
+        return None
+
+    # === Filter for input player ===
+    rankings_df = pd.DataFrame(player_averages)
+    rankings_df['rank'] = rankings_df['avg_fantasy_points'].rank(
+        ascending=False, method='min'
+    ).astype(int)
+
+    player_row = rankings_df[rankings_df['player_name'] == player_name]
+
+    if player_row.empty:
+        return None
+
+    return player_row['rank'].values[0]

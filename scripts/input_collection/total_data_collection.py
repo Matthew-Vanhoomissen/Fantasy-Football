@@ -108,6 +108,7 @@ def get_prediction(
     player1_name: str,
     player2_name: str,
     week: int,
+    season: int,
     name_file: pd.DataFrame,
     all_data_current: pd.DataFrame,
     all_data_past: pd.DataFrame,
@@ -129,11 +130,11 @@ def get_prediction(
 
     print(p1_t)
     print(p1)
-    p1_d = return_opponent(p1_t, week, 2025)
+    p1_d = return_opponent(p1_t, week, season)
     
     print(p2_t)
     print(p2)
-    p2_d = return_opponent(p2_t, week, 2025)
+    p2_d = return_opponent(p2_t, week, season)
 
     r1, display1, result1 = get_player_input(p1, p1_t, p1_d, all_data_current, week, pos1)
     r2, display2, result2 = get_player_input(p2, p2_t, p2_d, all_data_current, week, pos2)
@@ -187,13 +188,13 @@ def position_converter(
 
 
 def weekly_data_collection():
-    get_season_data(CURRENT_SEASON)
-    edit_data(CURRENT_SEASON)
+    # get_season_data(CURRENT_SEASON)
+    # edit_data(CURRENT_SEASON)
 
-    get_season_data(CURRENT_SEASON - 1)
-    edit_data(CURRENT_SEASON)
+    # get_season_data(CURRENT_SEASON - 1)
+    # edit_data(CURRENT_SEASON)
 
-    get_names()
+    # get_names()
     edit_player_names()
 
 

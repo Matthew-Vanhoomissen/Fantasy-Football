@@ -43,7 +43,7 @@ def get_names() -> None:
     cursor = None
     page = 0
 
-    while True:
+    while len(players_data) < 7000:
         params = {"cursor": cursor, "active": "true"} if cursor else {"active": "true"}
 
         r = requests.get(BASE_URL, headers=headers, params=params)

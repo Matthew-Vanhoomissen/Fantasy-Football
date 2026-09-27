@@ -5,6 +5,8 @@ import Select from 'react-select'
 import Image from 'next/image'
 
 export default function Home() {
+  const weekset = 3
+
   const [player1, setPlayer1] = useState("");
   const [player2, setPlayer2] = useState("");
 
@@ -27,7 +29,7 @@ export default function Home() {
   const [epa2, setEpa2] = useState(0)
   const [posStat2, setPosStat2] = useState("")
 
-  const [week, setWeek] = useState(18)
+  const [week, setWeek] = useState(weekset)
 
   const positions = ["QB", "WR", "RB", "TE", "All"]
   const [players, setPlayers] = useState(null)

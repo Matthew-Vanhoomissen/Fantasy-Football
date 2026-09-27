@@ -2,7 +2,7 @@ import pandas as pd
 
 
 def edit_data(
-    year: int
+    season: int
 ) -> None:
     """
     Reduces large season long data file into the necessary parameters for
@@ -55,6 +55,6 @@ def edit_data(
         'result'
     ]
 
-    all_data = pd.read_csv(f"data/play_by_play/play_by_play_202{year}.csv", low_memory=False, dtype={'week': 'int8', 'season': 'int16'}, usecols=NEEDED_COLUMNS)
+    all_data = pd.read_csv(f"data/play_by_play/play_by_play_{season}.csv", low_memory=False, dtype={'week': 'int8', 'season': 'int16'}, usecols=NEEDED_COLUMNS)
 
-    all_data.to_csv(f"data/play_by_play/play_by_play_202{year}.csv", index=False)
+    all_data.to_csv(f"data/play_by_play/play_by_play_{season}.csv", index=False)

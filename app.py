@@ -16,7 +16,7 @@ CORS(app, origins=[
 #     "http://localhost:3000",
 # ])
 
-CURRENT_SEASON = 2025
+CURRENT_SEASON = 2026
 
 name_file = pd.read_csv("data/offensive_players.csv", low_memory=False)
 override_name_file = pd.read_csv("data/override.csv", low_memory=False)
@@ -61,7 +61,16 @@ def format_players(data):
 @app.route("/", methods=["POST"])
 def prediction():
     data = request.json
-    result, display1, display2, reason = get_prediction(data['player1'], data['player2'], data['week'], name_file, all_data_current, all_data_past, override_name_file)
+    result, display1, display2, reason = get_prediction(
+        player1_name=data['player1'],
+        player2_name=data['player2'],
+        week=data['week'],
+        season=CURRENT_SEASON,
+        name_file=name_file,
+        all_data_current=all_data_current,
+        all_data_past=all_data_past,
+        override_name_file=override_name_file
+    )
 
     if reason != "success" and reason != "ODF":
         return jsonify({"data": None, "display1": None, "display2": None, "status": "failed", "reason": reason})
