@@ -77,7 +77,7 @@ def get_defensive_week_data(
     third_down_completion = converted_third_downs / all_third_downs if all_third_downs > 0 else 0
     fourth_down_completion = converted_fourth_downs / all_fourth_downs if all_fourth_downs > 0 else 0
 
-    return pd.DataFrame({
+    return pd.DataFrame([{
         'week': week,
         'team_name': team_name,
         'allowed_passing_yards': passing_yards / games_played,
@@ -90,4 +90,4 @@ def get_defensive_week_data(
         'third_down_allowed': third_down_completion,
         'fourth_down_allowed': fourth_down_completion
         
-    }), "success"
+    }]), "success"

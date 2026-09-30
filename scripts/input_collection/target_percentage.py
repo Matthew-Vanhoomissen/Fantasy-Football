@@ -46,9 +46,9 @@ def get_week_percentage(
     else:
         percentR = len(player_rushing_plays) / len(all_rushing_plays)
 
-    return pd.DataFrame({
+    return pd.DataFrame([{
         'week'                     : week,
         'player_name'              : player_name,
         'passing_target_percentage': percent,
         'rushing_percentage'       : percentR
-    })
+    }])

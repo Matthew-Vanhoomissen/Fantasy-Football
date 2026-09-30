@@ -93,12 +93,16 @@ def convert(
                 last_parts.append(part + ".")
             else:
                 last_parts.append(part)
-    
+
     cleaned_last = ""
     for part in last_parts:
         cleaned_last = cleaned_last + part
-    
-    player = file[(file['first_name'] == first_name) & (file['last_name'] == last_name)].iloc[0]
+
+    player = file[(file['first_name'] == first_name) & (file['last_name'] == last_name)]
+    if player.empty:
+        return None, None, None
+    player = player.iloc[0]
+
     team = player['team']
     if team == "LAR":
         team = "LA"
@@ -108,14 +112,10 @@ def convert(
     match = override[override['player_name'] == name]
     if not match.empty:
         abbr = match.iloc[0]['abbreviation']
-        player = player.iloc[0]
         return abbr, team, player['position']
 
-    if player.empty:
-        return None, None, None
     else:
-        player = player.iloc[0]
-        
+
         # Find all players with the same last name AND same first initial
         same_last_and_initial = file[
             (file['last_name'] == last_name) & 

@@ -149,9 +149,9 @@ def get_prediction(
         else:
             result = "NDF"
             if r1 is None:
-                r1, display1, result1 = get_player_input(p1, p1_t, p1_d, all_data_past, 19)
+                r1, display1, result1 = get_player_input(p1, p1_t, p1_d, all_data_past, 19, pos1)
             if r2 is None:
-                r2, display2, result2 = get_player_input(p2, p2_t, p2_d, all_data_past, 19)
+                r2, display2, result2 = get_player_input(p2, p2_t, p2_d, all_data_past, 19, pos2)
             if r1 is None or r2 is None:
                 return None, None, None, result
             result = "ODF"  # Old data found

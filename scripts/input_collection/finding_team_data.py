@@ -92,7 +92,7 @@ def get_offensive_week_data(
 
     tied_games = len(offensive_plays[offensive_plays['result'] == 0]['week'].unique())
 
-    return pd.DataFrame({
+    return pd.DataFrame([{
         'week'                  : week_input,
         'team_name'             : team_name,
         'epa_per_play'          : epa_per_play,
@@ -105,5 +105,5 @@ def get_offensive_week_data(
         'success_rate'          : success_rate,
         'home_team'             : home_team,
         'win_percentage'        : (won_games + (tied_games / 2)) / total_games
-    })
+    }])
 

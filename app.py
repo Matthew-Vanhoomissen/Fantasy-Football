@@ -61,16 +61,20 @@ def format_players(data):
 @app.route("/", methods=["POST"])
 def prediction():
     data = request.json
-    result, display1, display2, reason = get_prediction(
-        player1_name=data['player1'],
-        player2_name=data['player2'],
-        week=data['week'],
-        season=CURRENT_SEASON,
-        name_file=name_file,
-        all_data_current=all_data_current,
-        all_data_past=all_data_past,
-        override_name_file=override_name_file
-    )
+    try:
+        result, display1, display2, reason = get_prediction(
+            player1_name=data['player1'],
+            player2_name=data['player2'],
+            week=data['week'],
+            season=CURRENT_SEASON,
+            name_file=name_file,
+            all_data_current=all_data_current,
+            all_data_past=all_data_past,
+            override_name_file=override_name_file
+        )
+    except Exception as e:
+        print(f"Error during prediction: {e}")
+        return jsonify({"data": None, "display1": None, "display2": None, "status": "failed", "reason": "Server error. Please try again"}), 500
 
     if reason != "success" and reason != "ODF":
         return jsonify({"data": None, "display1": None, "display2": None, "status": "failed", "reason": reason})

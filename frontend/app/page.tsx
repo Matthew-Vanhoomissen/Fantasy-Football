@@ -46,13 +46,19 @@ export default function Home() {
   async function submit() {
     setResult("Loading...")
     setAdditionalInfo("")
-    const res = await fetch(`${API_URL}/`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ player1, player2, week})
-    });
-
-    const data = await res.json();
+    let data;
+    try {
+      const res = await fetch(`${API_URL}/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ player1, player2, week})
+      });
+      data = await res.json();
+    } catch (err) {
+      console.error("Prediction request failed:", err);
+      setResult("Could not reach the server. Please try again later")
+      return;
+    }
     console.log(JSON.stringify(data, null, 2));
     console.log("data.data:", data.data);
     console.log("type:", typeof data.data);

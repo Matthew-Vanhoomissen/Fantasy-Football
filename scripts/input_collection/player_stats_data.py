@@ -42,7 +42,10 @@ def calculate_fantasy_points(
     )
 
 
-def extract_player_stats_for_plays(plays: pd.DataFrame, player_name: str) -> dict:
+def extract_player_stats_for_plays(
+    plays: pd.DataFrame,
+    player_name: str
+) -> dict:
     """
     Extracts all raw counting stats for a player from a set of plays.
     Returns a dict of raw totals ready for fantasy point calculation.
@@ -344,7 +347,7 @@ def get_player_position_rank(
         if p_games == 0:
             continue
 
-        total_fp = calculate_fantasy_points(extract_player_stats_for_plays(prior_plays, player))
+        total_fp = calculate_fantasy_points(**extract_player_stats_for_plays(prior_plays, player))
 
         avg_fp = total_fp / p_games
 
