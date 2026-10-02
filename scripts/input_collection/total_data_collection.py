@@ -191,9 +191,6 @@ def weekly_data_collection():
     get_season_data(CURRENT_SEASON)
     edit_data(CURRENT_SEASON)
 
-    get_season_data(CURRENT_SEASON - 1)
-    edit_data(CURRENT_SEASON - 1)
-
     get_names()
     edit_player_names()
 

@@ -5,7 +5,7 @@ import Select from 'react-select'
 import Image from 'next/image'
 
 export default function Home() {
-  const weekset = 3
+  const weekset = 4
 
   const [player1, setPlayer1] = useState("");
   const [player2, setPlayer2] = useState("");
@@ -90,7 +90,7 @@ export default function Home() {
         setEpa1(data.display1['epa_per_rush'].toFixed())
       }
       else if(data.display1['position'] === "WR" || data.display1['position'] === "TE") {
-        setPosStat1("Average Recieving Yards: " + data.display1['average_recieving_yards'].toFixed(2))
+        setPosStat1("Average Receiving Yards: " + data.display1['average_recieving_yards'].toFixed(2))
         setEpa1(data.display1['epa_per_pass'].toFixed())
       }
       else {
@@ -112,7 +112,7 @@ export default function Home() {
         setEpa2(data.display2['epa_per_rush'].toFixed(2))
       }
       else if(data.display2['position'] === "WR" || data.display2['position'] === "TE") {
-        setPosStat2("Average Recieving Yards: " + data.display2['average_recieving_yards'].toFixed(2))
+        setPosStat2("Average Receiving Yards: " + data.display2['average_recieving_yards'].toFixed(2))
         setEpa2(data.display2['epa_per_pass'].toFixed(2))
       }
       else {
