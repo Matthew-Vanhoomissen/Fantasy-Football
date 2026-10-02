@@ -21,8 +21,8 @@ def main():
 
     feature_cols = [
         "receptions_avg", "average_passing_yards", "average_rushing_yards",
-        "average_recieving_yards", "passing_tds_avg", "rushing_tds_avg",
-        "recieving_tds_avg", "bust_points_average",
+        "average_receiving_yards", "passing_tds_avg", "rushing_tds_avg",
+        "receiving_tds_avg", "bust_points_average",
         "bust_percent", "boom_points_average", "boom_percent",
         "passing_target_percentage", "rushing_percentage",
         "epa_per_rush", "epa_per_pass", "pass_percent", "rush_percent",

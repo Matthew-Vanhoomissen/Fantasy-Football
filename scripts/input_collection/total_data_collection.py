@@ -20,7 +20,7 @@ from scripts.csv_manipulation.shrink_csv import edit_data
 CURRENT_SEASON = 2026
 
 def get_player_input(
-    player_name: str,
+    player_id: str,
     offensive_team_name: str,
     defensive_team_name: str,
     all_data: pd.DataFrame,
@@ -33,7 +33,7 @@ def get_player_input(
     retrieve predicted deviation from average to return predicted points.
 
     Args:
-        player_name           : Abbreviated player name (e.g. 'T.Hill')
+        player_id             : GSIS player ID (e.g. '00-0037240')
         offensive_team_name   : NFL team abbreviation (e.g. 'MIA')
         defensive_team_name   : NFL team abbreviation (e.g. 'BAL')
         all_data              : Fully loaded play-by-play data for current season
@@ -42,11 +42,11 @@ def get_player_input(
     """
    
     defensive_team_data = create_csvs_defense(all_data, defensive_team_name)
-    offensive_team_data, player_data = create_csvs_offense(all_data, player_name, offensive_team_name)
+    offensive_team_data, player_data = create_csvs_offense(all_data, player_id, offensive_team_name)
 
     defensive_stats, def_result = get_defensive_week_data(defensive_team_name, defensive_team_data, week)
     offensive_stats = get_offensive_week_data(offensive_team_name, offensive_team_data, week)
-    player_stats = get_player_week_data(player_name, offensive_team_name, player_data, all_data, week, position)
+    player_stats = get_player_week_data(player_id, offensive_team_name, player_data, all_data, week, position)
 
     if defensive_stats is None:
         return None, None, def_result
@@ -70,8 +70,8 @@ def get_player_input(
 
     feature_cols = [
         "receptions_avg", "average_passing_yards", "average_rushing_yards",
-        "average_recieving_yards", "passing_tds_avg", "rushing_tds_avg",
-        "recieving_tds_avg", "bust_points_average",
+        "average_receiving_yards", "passing_tds_avg", "rushing_tds_avg",
+        "receiving_tds_avg", "bust_points_average",
         "bust_percent", "boom_points_average", "boom_percent",
         "passing_target_percentage", "rushing_percentage",
         "epa_per_rush", "epa_per_pass", "pass_percent", "rush_percent",
@@ -96,7 +96,7 @@ def get_player_input(
 
     display_cols = [
         "last_three_weeks_diff", "average_fantasy_points", "average_passing_yards", "bust_percent", 
-        "success_rate", "average_recieving_yards", "average_rushing_yards", "boom_percent", 
+        "success_rate", "average_receiving_yards", "average_rushing_yards", "boom_percent", 
         "boom_points_average", "bust_points_average", "epa_per_pass", "epa_per_rush", "recent_momentum"
     ]
     display_data = data[display_cols]
@@ -111,16 +111,15 @@ def get_prediction(
     season: int,
     name_file: pd.DataFrame,
     all_data_current: pd.DataFrame,
-    all_data_past: pd.DataFrame,
-    override_name_file: pd.DataFrame
+    all_data_past: pd.DataFrame
 ) -> tuple[dict, dict, int]:
     """
     Collects and coverts all input names into data which is input into the model
     for prediciton. Handles conversion and error handling and returns the result
     to the backend app.py
     """
-    p1, p1_t, pos1 = convert(player1_name, name_file, override_name_file)
-    p2, p2_t, pos2 = convert(player2_name, name_file, override_name_file)
+    p1, p1_t, pos1 = convert(player1_name, name_file)
+    p2, p2_t, pos2 = convert(player2_name, name_file)
     if p1 is None or p2 is None:
         return None, None, None, "NPF"
 
@@ -128,12 +127,7 @@ def get_prediction(
     pos1 = position_converter(pos1)
     pos2 = position_converter(pos2)
 
-    print(p1_t)
-    print(p1)
     p1_d = return_opponent(p1_t, week, season)
-    
-    print(p2_t)
-    print(p2)
     p2_d = return_opponent(p2_t, week, season)
 
     r1, display1, result1 = get_player_input(p1, p1_t, p1_d, all_data_current, week, pos1)
@@ -160,6 +154,9 @@ def get_prediction(
         winner = 1
     else:
         winner = 2
+
+    pos1 = position_deconverter(pos1)
+    pos2 = position_deconverter(pos2)
     
     display1['position'] = pos1
     display1['team'] = p1_t
@@ -187,11 +184,31 @@ def position_converter(
         return -1
 
 
+def position_deconverter(
+    position: int
+) -> str:
+    """
+    Converts position integer code back into string
+    for frontend data
+    """
+    if position == 0:
+        return "QB"
+    elif position == 1:
+        return "RB"
+    elif position == 2:
+        return "WR/TE"
+    else:
+        return "MISC"
+
+
 def weekly_data_collection():
     get_season_data(CURRENT_SEASON)
     edit_data(CURRENT_SEASON)
 
-    get_names()
+    get_season_data(CURRENT_SEASON - 1)
+    edit_data(CURRENT_SEASON - 1)
+
+    get_names(CURRENT_SEASON)
     edit_player_names()
 
 

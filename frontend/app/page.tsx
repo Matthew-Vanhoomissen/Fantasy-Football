@@ -70,7 +70,7 @@ export default function Home() {
         setResult("No data found for selected player (injuries this season or has not made an appearance). Player may be on bye week")
       }
       else if(data.reason === "BW"){
-        setResult("This week is a bi-week for one of these players. No predictions can be made on a bi-week. Please try a different week!")
+        setResult("This week is a bye-week for one of these players. No predictions can be made on a bye-week. Please try a different week!")
       }
       else {
         setResult(data.reason)
@@ -90,7 +90,7 @@ export default function Home() {
         setEpa1(data.display1['epa_per_rush'].toFixed())
       }
       else if(data.display1['position'] === "WR" || data.display1['position'] === "TE") {
-        setPosStat1("Average Receiving Yards: " + data.display1['average_recieving_yards'].toFixed(2))
+        setPosStat1("Average Receiving Yards: " + data.display1['average_receiving_yards'].toFixed(2))
         setEpa1(data.display1['epa_per_pass'].toFixed())
       }
       else {
@@ -112,7 +112,7 @@ export default function Home() {
         setEpa2(data.display2['epa_per_rush'].toFixed(2))
       }
       else if(data.display2['position'] === "WR" || data.display2['position'] === "TE") {
-        setPosStat2("Average Receiving Yards: " + data.display2['average_recieving_yards'].toFixed(2))
+        setPosStat2("Average Receiving Yards: " + data.display2['average_receiving_yards'].toFixed(2))
         setEpa2(data.display2['epa_per_pass'].toFixed(2))
       }
       else {

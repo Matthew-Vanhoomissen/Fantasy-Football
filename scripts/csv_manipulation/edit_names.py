@@ -1,28 +1,35 @@
-import pandas as pd 
+import pandas as pd
 
 
 def edit_player_names() -> None:
     """
-    Filters raw data from BALLDONTLIE API into necessary values
+    Filters raw roster data from nflverse into necessary values
     to be utilized in the application. Filters for offensive players
-    and corrects team name mismatches.
+    on a current roster and keeps the GSIS ID for play-by-play lookups.
 
     """
-    players = pd.read_csv("data/nfl_players.csv")
+    players = pd.read_csv("data/nfl_players.csv", low_memory=False)
+
+    # Players without an ID cannot be matched to plays and released or
+    # retired players are no longer on the listed team
+    players = players[
+        (players['position'].isin(["QB", "WR", "RB", "TE", "FB"])) &
+        (~players['status'].isin(["CUT", "RET"])) &
+        (players['gsis_id'].notna())
+    ]
 
     new_dataframe = []
     for row in players.itertuples(index=False):
-        if row.position in ["QB", "WR", "RB", "TE", "FB"]:
-            team_name = row.team
-            if team_name == "LAR":
-                team_name = "LA"
-            elif team_name == "WSH":
-                team_name = "WAS"
-            new_dataframe.append({
-                'first_name': row.first_name,
-                'last_name': row.last_name,
-                'team': team_name,
-                'position': row.position,
-            })
+        # Split the commonly used full name (e.g. 'Matthew Stafford') rather than the
+        # legal first name (e.g. 'John') so the frontend sends back the full name
+        first_name, last_name = row.full_name.split(" ", 1)
+        new_dataframe.append({
+            'first_name': first_name,
+            'last_name': last_name,
+            'full_name': row.full_name,
+            'team': row.team,
+            'position': row.position,
+            'gsis_id': row.gsis_id
+        })
     new_dataframe = pd.DataFrame(new_dataframe)
     new_dataframe.to_csv("data/offensive_players.csv", index=False)

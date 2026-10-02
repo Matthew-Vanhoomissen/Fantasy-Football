@@ -3,7 +3,7 @@ import pandas as pd
 
 def get_week_percentage(
     team_name: str,
-    player_name: str,
+    player_id: str,
     pbp: pd.DataFrame,
     week: int
 ) -> pd.DataFrame:
@@ -24,7 +24,7 @@ def get_week_percentage(
         (pbp['week'] < week)
         ]
 
-    play_passing_plays = all_passing_plays[all_passing_plays['receiver_player_name'] == player_name]
+    play_passing_plays = all_passing_plays[all_passing_plays['receiver_player_id'] == player_id]
     if len(all_passing_plays) == 0:
         percent = 0
     else:
@@ -40,7 +40,7 @@ def get_week_percentage(
         (pbp["penalty"] == 0) &
         (pbp['week'] < week)
         ]
-    player_rushing_plays = all_rushing_plays[all_rushing_plays['rusher_player_name'] == player_name]
+    player_rushing_plays = all_rushing_plays[all_rushing_plays['rusher_player_id'] == player_id]
     if len(all_rushing_plays) == 0:
         percentR = 0
     else:
@@ -48,7 +48,7 @@ def get_week_percentage(
 
     return pd.DataFrame([{
         'week'                     : week,
-        'player_name'              : player_name,
+        'player_id'                : player_id,
         'passing_target_percentage': percent,
         'rushing_percentage'       : percentR
     }])

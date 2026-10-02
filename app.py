@@ -19,7 +19,6 @@ CORS(app, origins=[
 CURRENT_SEASON = 2026
 
 name_file = pd.read_csv("data/offensive_players.csv", low_memory=False)
-override_name_file = pd.read_csv("data/override.csv", low_memory=False)
 all_data_current = pd.read_csv(f"data/play_by_play/play_by_play_{CURRENT_SEASON}.csv", low_memory=False)
 all_data_past = pd.read_csv(f"data/play_by_play/play_by_play_{CURRENT_SEASON - 1}.csv", low_memory=False)
 
@@ -69,8 +68,7 @@ def prediction():
             season=CURRENT_SEASON,
             name_file=name_file,
             all_data_current=all_data_current,
-            all_data_past=all_data_past,
-            override_name_file=override_name_file
+            all_data_past=all_data_past
         )
     except Exception as e:
         print(f"Error during prediction: {e}")

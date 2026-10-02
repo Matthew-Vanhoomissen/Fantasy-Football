@@ -44,15 +44,15 @@ def calculate_fantasy_points(
 
 def extract_player_stats_for_plays(
     plays: pd.DataFrame,
-    player_name: str
+    player_id: str
 ) -> dict:
     """
     Extracts all raw counting stats for a player from a set of plays.
     Returns a dict of raw totals ready for fantasy point calculation.
     """
-    passing_plays   = plays[plays['passer_player_name']   == player_name]
-    rushing_plays   = plays[plays['rusher_player_name']   == player_name]
-    receiving_plays = plays[plays['receiver_player_name'] == player_name]
+    passing_plays   = plays[plays['passer_player_id']   == player_id]
+    rushing_plays   = plays[plays['rusher_player_id']   == player_id]
+    receiving_plays = plays[plays['receiver_player_id'] == player_id]
 
     return {
         'passing_yards'   : passing_plays['passing_yards'].sum(),
@@ -60,7 +60,7 @@ def extract_player_stats_for_plays(
         'receiving_yards' : receiving_plays['receiving_yards'].sum(),
         'receptions'      : len(receiving_plays[receiving_plays['complete_pass'] == 1]),
         'interceptions'   : passing_plays['interception'].sum(),
-        'fumbles_lost'    : plays[plays['fumbled_1_player_name'] == player_name]['fumble_lost'].sum(),
+        'fumbles_lost'    : plays[plays['fumbled_1_player_id'] == player_id]['fumble_lost'].sum(),
         'pass_td'         : passing_plays['pass_touchdown'].sum(),
         'rush_td'         : rushing_plays['rush_touchdown'].sum(),
         'rec_td'          : receiving_plays['pass_touchdown'].sum(),
@@ -72,7 +72,7 @@ def extract_player_stats_for_plays(
 
 def _calculate_boom_bust_metrics(
     prior_plays: pd.DataFrame,
-    player_name: str,
+    player_id: str,
     average_fp: float,
     weeks: list,
     threshold: float = 6.0
@@ -87,7 +87,7 @@ def _calculate_boom_bust_metrics(
 
     for week_num in weeks:
         week_plays = prior_plays[prior_plays['week'] == week_num]
-        raw        = extract_player_stats_for_plays(week_plays, player_name)
+        raw        = extract_player_stats_for_plays(week_plays, player_id)
         week_fp    = calculate_fantasy_points(**raw)
         diff       = week_fp - average_fp
 
@@ -109,7 +109,7 @@ def _calculate_boom_bust_metrics(
 
 def _calculate_recent_average(
     prior_plays: pd.DataFrame,
-    player_name: str,
+    player_id: str,
     weeks: list,
     n_weeks: int = 3
 ) -> float:
@@ -121,7 +121,7 @@ def _calculate_recent_average(
 
     for week in weeks[-n_weeks:]:
         week_plays = prior_plays[prior_plays['week'] == week]
-        raw        = extract_player_stats_for_plays(week_plays, player_name)
+        raw        = extract_player_stats_for_plays(week_plays, player_id)
         recent_total  += calculate_fantasy_points(**raw)
         weeks_counted += 1
 
@@ -133,7 +133,7 @@ def _calculate_recent_average(
 # ============================================================
 
 def get_player_week_data(
-    player_name: str,
+    player_id: str,
     team_name: str,
     player_data: pd.DataFrame,
     all_stats: pd.DataFrame,
@@ -146,7 +146,7 @@ def get_player_week_data(
     Returns None if the player has fewer than 3 games played.
 
     Args:
-        player_name : Abbreviated player name (e.g. 'T.Hill')
+        player_id   : GSIS player ID (e.g. '00-0037240')
         team_name   : NFL team abbreviation (e.g. 'MIA')
         player_data : Play-by-play data for the player's team
         all_stats   : Full play-by-play data across all teams
@@ -163,11 +163,11 @@ def get_player_week_data(
 
     # === Current week target variable ===
     current_week_plays = player_data[player_data['week'] == week_input]
-    cw_raw             = extract_player_stats_for_plays(current_week_plays, player_name)
+    cw_raw             = extract_player_stats_for_plays(current_week_plays, player_id)
     week_fantasy_points = calculate_fantasy_points(**cw_raw)
 
     # === Season averages (prior weeks) ===
-    season_raw      = extract_player_stats_for_plays(prior_plays, player_name)
+    season_raw      = extract_player_stats_for_plays(prior_plays, player_id)
     total_fp        = calculate_fantasy_points(**season_raw)
     average_fp      = total_fp / games_played
 
@@ -177,20 +177,20 @@ def get_player_week_data(
 
     # === Boom / bust metrics ===
     weeks        = sorted(prior_plays['week'].unique())
-    boom_bust    = _calculate_boom_bust_metrics(prior_plays, player_name, average_fp, weeks)
+    boom_bust    = _calculate_boom_bust_metrics(prior_plays, player_id, average_fp, weeks)
 
     # === Recent form ===
-    three_week_avg      = _calculate_recent_average(prior_plays, player_name, weeks)
+    three_week_avg      = _calculate_recent_average(prior_plays, player_id, weeks)
     last_three_weeks_diff = three_week_avg - average_fp
 
     # === Red zone usage ===
     red_zone_plays   = prior_plays[prior_plays['yardline_100'] <= 20]
-    red_zone_targets = red_zone_plays[red_zone_plays['receiver_player_name'] == player_name].shape[0]
-    red_zone_carries = red_zone_plays[red_zone_plays['rusher_player_name']   == player_name].shape[0]
+    red_zone_targets = red_zone_plays[red_zone_plays['receiver_player_id'] == player_id].shape[0]
+    red_zone_carries = red_zone_plays[red_zone_plays['rusher_player_id']   == player_id].shape[0]
 
     # === Completion percentage ===
     pass_attempts      = prior_plays[
-        (prior_plays['passer_player_name'] == player_name) &
+        (prior_plays['passer_player_id'] == player_id) &
         (prior_plays['play_type']          == 'pass')
     ]
     completions        = pass_attempts[pass_attempts['complete_pass'] == 1].shape[0]
@@ -198,26 +198,26 @@ def get_player_week_data(
 
     # === Positional ranking within team ===
     position_ranking = get_player_position_rank(
-        team_name, player_name, position, all_stats, week_input
+        team_name, player_id, position, all_stats, week_input
     )
     
     # === External percentage features ===
-    percentages = get_week_percentage(team_name, player_name, all_stats, week_input)
+    percentages = get_week_percentage(team_name, player_id, all_stats, week_input)
 
     # === Assemble feature row ===
     player_stats = [{
         'week'                 : week_input,
         'team_name'            : team_name,
-        'player_name'          : player_name,
+        'player_id'            : player_id,
         'position'             : position,
         'position_ranking'     : position_ranking,
         'average_passing_yards': average_p_yards,
         'average_rushing_yards': average_r_yards,
-        'average_recieving_yards': average_rec_yards,
+        'average_receiving_yards': average_rec_yards,
         'receptions_avg'       : season_raw['receptions']    / games_played,
         'passing_tds_avg'      : season_raw['pass_td']       / games_played,
         'rushing_tds_avg'      : season_raw['rush_td']       / games_played,
-        'recieving_tds_avg'    : season_raw['rec_td']        / games_played,
+        'receiving_tds_avg'    : season_raw['rec_td']        / games_played,
         'average_fantasy_points': average_fp,
         'week_fantasy_points'  : week_fantasy_points,
         'bust_percent'         : boom_bust['bust_games']  / games_played,
@@ -237,15 +237,15 @@ def get_player_week_data(
 # PLAYER / TEAM LOOKUP UTILITIES
 # ============================================================
 
-def get_player_team(all_data: pd.DataFrame, player_name: str) -> str | None:
+def get_player_team(all_data: pd.DataFrame, player_id: str) -> str | None:
     """
     Returns the offensive team abbreviation a player most frequently
     appeared for across all available play-by-play data.
     """
     player_plays = all_data[
-        (all_data['passer_player_name']   == player_name) |
-        (all_data['rusher_player_name']   == player_name) |
-        (all_data['receiver_player_name'] == player_name)
+        (all_data['passer_player_id']   == player_id) |
+        (all_data['rusher_player_id']   == player_id) |
+        (all_data['receiver_player_id'] == player_id)
     ]
 
     if player_plays.empty:
@@ -276,7 +276,7 @@ def get_opponent_team(
 
 def did_player_play_this_week(
     player_data: pd.DataFrame,
-    player_name: str,
+    player_id: str,
     week: int
 ) -> bool:
     """
@@ -287,16 +287,16 @@ def did_player_play_this_week(
     week_plays = player_data[player_data['week'] == week]
 
     return (
-        week_plays[week_plays['passer_player_name']   == player_name]['passing_yards'].sum()  > 0 or
-        week_plays[week_plays['rusher_player_name']   == player_name]['rushing_yards'].sum()  > 0 or
-        week_plays[week_plays['receiver_player_name'] == player_name]['receiving_yards'].sum() > 0 or
-        not week_plays[week_plays['receiver_player_name'] == player_name].empty
+        week_plays[week_plays['passer_player_id']   == player_id]['passing_yards'].sum()  > 0 or
+        week_plays[week_plays['rusher_player_id']   == player_id]['rushing_yards'].sum()  > 0 or
+        week_plays[week_plays['receiver_player_id'] == player_id]['receiving_yards'].sum() > 0 or
+        not week_plays[week_plays['receiver_player_id'] == player_id].empty
     )
 
 
 def get_player_position_rank(
     team_name: str,
-    player_name: str,
+    player_id: str,
     position: int,
     all_data: pd.DataFrame,
     week_input: int
@@ -324,9 +324,9 @@ def get_player_position_rank(
 
     # === Obtain player list for player's team ===
     all_players = pd.concat([
-        prior_plays['passer_player_name'],
-        prior_plays['rusher_player_name'],
-        prior_plays['receiver_player_name']
+        prior_plays['passer_player_id'],
+        prior_plays['rusher_player_id'],
+        prior_plays['receiver_player_id']
     ]).dropna().unique()
 
     # === Iterate through player list ===
@@ -334,14 +334,14 @@ def get_player_position_rank(
     for player in all_players:
         p_plays = prior_plays
 
-        p_passing_yards = p_plays[p_plays['passer_player_name'] == player]['passing_yards'].sum()
-        p_rushing_yards = p_plays[p_plays['rusher_player_name'] == player]['rushing_yards'].sum()
-        p_receiving_yards = p_plays[p_plays['receiver_player_name'] == player]['receiving_yards'].sum()
+        p_passing_yards = p_plays[p_plays['passer_player_id'] == player]['passing_yards'].sum()
+        p_rushing_yards = p_plays[p_plays['rusher_player_id'] == player]['rushing_yards'].sum()
+        p_receiving_yards = p_plays[p_plays['receiver_player_id'] == player]['receiving_yards'].sum()
 
         p_games = prior_plays[
-            (prior_plays['passer_player_name'] == player) |
-            (prior_plays['rusher_player_name'] == player) |
-            (prior_plays['receiver_player_name'] == player)
+            (prior_plays['passer_player_id'] == player) |
+            (prior_plays['rusher_player_id'] == player) |
+            (prior_plays['receiver_player_id'] == player)
         ]['week'].nunique()
 
         if p_games == 0:
@@ -373,7 +373,7 @@ def get_player_position_rank(
         # === Position filtering ===
         if p_position == position:
             player_averages.append({
-                'player_name': player,
+                'player_id': player,
                 'avg_fantasy_points': avg_fp
             })
 
@@ -386,7 +386,7 @@ def get_player_position_rank(
         ascending=False, method='min'
     ).astype(int)
 
-    player_row = rankings_df[rankings_df['player_name'] == player_name]
+    player_row = rankings_df[rankings_df['player_id'] == player_id]
 
     if player_row.empty:
         return None

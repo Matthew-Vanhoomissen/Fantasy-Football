@@ -9,7 +9,7 @@ data['recent_momentum'] = data['average_fantasy_points'] + data['last_three_week
 data['boom_weighted_avg'] = data['average_fantasy_points'] * (1 + data['boom_percent'])
 data['total_usage'] = data['passing_target_percentage'] + data['rushing_percentage']
 data['boom_bust_ratio'] = data['boom_percent'] / (data['bust_percent'] + 0.01)
-data['td_rate'] = (data['passing_tds_avg'] + data['rushing_tds_avg'] + data['recieving_tds_avg'])
+data['td_rate'] = (data['passing_tds_avg'] + data['rushing_tds_avg'] + data['receiving_tds_avg'])
 data['matchup_advantage'] = data['epa_per_play'] - data['avg_epa_against']
 data['offensive_efficiency'] = data['epa_per_play'] * data['total_usage']
 
