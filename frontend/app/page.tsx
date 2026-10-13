@@ -5,7 +5,7 @@ import Select from 'react-select'
 import Image from 'next/image'
 
 export default function Home() {
-  const weekset = 4
+  const weekset = 6
 
   const [player1, setPlayer1] = useState("");
   const [player2, setPlayer2] = useState("");
