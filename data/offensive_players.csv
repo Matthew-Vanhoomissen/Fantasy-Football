@@ -3,6 +3,7 @@ Aaron,Rodgers,Aaron Rodgers,PIT,QB,00-0023459
 Joe,Flacco,Joe Flacco,CIN,QB,00-0026158
 Josh,Johnson,Josh Johnson,CIN,QB,00-0026300
 Matthew,Stafford,Matthew Stafford,LA,QB,00-0026498
+Andy,Dalton,Andy Dalton,ATL,QB,00-0027973
 Tyrod,Taylor,Tyrod Taylor,GB,QB,00-0028118
 Case,Keenum,Case Keenum,CHI,QB,00-0028986
 Kirk,Cousins,Kirk Cousins,LV,QB,00-0029604
@@ -20,6 +21,7 @@ Jameis,Winston,Jameis Winston,NYG,QB,00-0031503
 Stefon,Diggs,Stefon Diggs,WAS,WR,00-0031588
 Michael,Burton,Michael Burton,CLE,RB,00-0031595
 Darren,Waller,Darren Waller,CAR,TE,00-0031610
+DeAndre,Carter,DeAndre Carter,DET,WR,00-0031763
 Ameer,Abdullah,Ameer Abdullah,JAX,RB,00-0032104
 Phillip,Dorsett,Phillip Dorsett,LV,WR,00-0032208
 Marcus,Mariota,Marcus Mariota,WAS,QB,00-0032268
@@ -68,11 +70,12 @@ Chris,Godwin Jr.,Chris Godwin Jr.,TB,WR,00-0033921
 Joshua,Dobbs,Joshua Dobbs,DET,QB,00-0033949
 Jeremy,McNichols,Jeremy McNichols,WAS,RB,00-0033955
 Tyler,Conklin,Tyler Conklin,DET,TE,00-0034270
-Marquez,Valdes-Scantling,Marquez Valdes-Scantling,LAC,WR,00-0034272
+Marquez,Valdes-Scantling,Marquez Valdes-Scantling,PIT,WR,00-0034272
 Courtland,Sutton,Courtland Sutton,DEN,WR,00-0034348
 Dallas,Goedert,Dallas Goedert,PHI,TE,00-0034351
 Ian,Thomas,Ian Thomas,LV,TE,00-0034365
 Dalton,Schultz,Dalton Schultz,HOU,TE,00-0034383
+Justin,Watson,Justin Watson,KC,WR,00-0034386
 Ray-Ray,McCloud,Ray-Ray McCloud,CHI,WR,00-0034407
 Braxton,Berrios,Braxton Berrios,NYG,WR,00-0034419
 Trent,Sherfield,Trent Sherfield,BUF,WR,00-0034487
@@ -99,7 +102,9 @@ Foster,Moreau,Foster Moreau,HOU,TE,00-0034981
 Ashton,Dulin,Ashton Dulin,IND,WR,00-0035021
 Stephen,Carlson,Stephen Carlson,CHI,TE,00-0035039
 D.J.,Montgomery,D.J. Montgomery,IND,WR,00-0035045
+Jake,Browning,Jake Browning,LAC,QB,00-0035100
 Alec,Ingold,Alec Ingold,LAC,RB,00-0035125
+Mecole,Hardman,Mecole Hardman,IND,WR,00-0035140
 Olamide,Zaccheaus,Olamide Zaccheaus,ATL,WR,00-0035208
 Kyler,Murray,Kyler Murray,MIN,QB,00-0035228
 T.J.,Hockenson,T.J. Hockenson,MIN,TE,00-0035229
@@ -114,7 +119,6 @@ Chris,Myarick,Chris Myarick,LV,TE,00-0035345
 David,Sills,David Sills,TB,WR,00-0035359
 Lil'Jordan,Humphrey,Lil'Jordan Humphrey,DEN,WR,00-0035406
 Greg,Dortch,Greg Dortch,BUF,WR,00-0035500
-Darius,Slayton,Darius Slayton,IND,WR,00-0035535
 Ty,Johnson,Ty Johnson,BUF,RB,00-0035537
 Tom,Kennedy,Tom Kennedy,DET,WR,00-0035544
 Craig,Reynolds,Craig Reynolds,WAS,RB,00-0035567
@@ -139,7 +143,6 @@ Jonathan,Ward,Jonathan Ward,BAL,RB,00-0035924
 Tyler,Huntley,Tyler Huntley,BAL,QB,00-0035993
 Salvon,Ahmed,Salvon Ahmed,CHI,RB,00-0036020
 Juwan,Johnson,Juwan Johnson,NO,TE,00-0036040
-James,Proche,James Proche,CLE,WR,00-0036133
 Rico,Dowdle,Rico Dowdle,PIT,RB,00-0036139
 J.K.,Dobbins,J.K. Dobbins,DEN,RB,00-0036158
 Isaiah,Hodgins,Isaiah Hodgins,PIT,WR,00-0036165
@@ -158,7 +161,7 @@ Cole,Kmet,Cole Kmet,CHI,TE,00-0036290
 Darnell,Mooney,Darnell Mooney,NYG,WR,00-0036309
 Justin,Jefferson,Justin Jefferson,MIN,WR,00-0036322
 Devin,Duvernay,Devin Duvernay,ARI,WR,00-0036331
-Josiah,Deguara,Josiah Deguara,PHI,TE,00-0036332
+Josiah,Deguara,Josiah Deguara,SEA,TE,00-0036332
 K.J.,Osborn,K.J. Osborn,TEN,WR,00-0036345
 Justin,Herbert,Justin Herbert,LAC,QB,00-0036355
 CeeDee,Lamb,CeeDee Lamb,DAL,WR,00-0036358
@@ -170,7 +173,6 @@ Van,Jefferson,Van Jefferson,WAS,WR,00-0036415
 Adam,Trautman,Adam Trautman,DEN,TE,00-0036422
 Albert,Okwuegbunam,Albert Okwuegbunam,LV,TE,00-0036423
 DeeJay,Dallas,DeeJay Dallas,MIN,RB,00-0036425
-Tyler,Johnson,Tyler Johnson,NYJ,WR,00-0036427
 Charlie,Woerner,Charlie Woerner,ATL,TE,00-0036429
 Joe,Burrow,Joe Burrow,CIN,QB,00-0036442
 Chris,Blair,Chris Blair,ATL,WR,00-0036463
@@ -180,6 +182,7 @@ Rashod,Bateman,Rashod Bateman,BAL,WR,00-0036550
 Nico,Collins,Nico Collins,HOU,WR,00-0036554
 Chuba,Hubbard,Chuba Hubbard,CAR,RB,00-0036555
 Brevin,Jordan,Brevin Jordan,HOU,TE,00-0036556
+Elijah,Mitchell,Elijah Mitchell,PHI,RB,00-0036567
 Quintin,Morris,Quintin Morris,JAX,TE,00-0036590
 Jaylen,Waddle,Jaylen Waddle,DEN,WR,00-0036613
 Dyami,Brown,Dyami Brown,WAS,WR,00-0036626
@@ -203,7 +206,6 @@ Rhamondre,Stevenson,Rhamondre Stevenson,NE,RB,00-0036875
 Kylen,Granson,Kylen Granson,TEN,TE,00-0036876
 Sam,Ehlinger,Sam Ehlinger,DEN,QB,00-0036879
 Luke,Farrell,Luke Farrell,SF,TE,00-0036887
-Najee,Harris,Najee Harris,NYG,RB,00-0036893
 Pat,Freiermuth,Pat Freiermuth,PIT,TE,00-0036894
 Davis,Mills,Davis Mills,HOU,QB,00-0036898
 Ja'Marr,Chase,Ja'Marr Chase,CIN,WR,00-0036900
@@ -211,6 +213,7 @@ Khalil,Herbert,Khalil Herbert,ATL,RB,00-0036906
 DeVonta,Smith,DeVonta Smith,PHI,WR,00-0036912
 Kenny,Gainwell,Kenny Gainwell,TB,RB,00-0036919
 Michael,Carter,Michael Carter,TEN,RB,00-0036924
+Kyle,Trask,Kyle Trask,DAL,QB,00-0036928
 Justin,Fields,Justin Fields,KC,QB,00-0036945
 Michael,Bandy,Michael Bandy,DEN,WR,00-0036959
 Amon-Ra,St. Brown,Amon-Ra St. Brown,DET,WR,00-0036963
@@ -240,6 +243,7 @@ Irvin,Charles,Irvin Charles,SEA,WR,00-0037156
 Bam,Knight,Bam Knight,ARI,RB,00-0037157
 Isiah,Pacheco,Isiah Pacheco,DET,RB,00-0037197
 Jaylen,Warren,Jaylen Warren,PIT,RB,00-0037228
+Kevin,Austin Jr.,Kevin Austin Jr.,NO,WR,00-0037231
 Drake,London,Drake London,ATL,WR,00-0037238
 Chris,Olave,Chris Olave,NO,WR,00-0037239
 Jameson,Williams,Jameson Williams,DET,WR,00-0037240
@@ -250,6 +254,7 @@ Rachaad,White,Rachaad White,WAS,RB,00-0037256
 Dameon,Pierce,Dameon Pierce,PHI,RB,00-0037258
 Khalil,Shakir,Khalil Shakir,BUF,WR,00-0037261
 Tyler,Allgeier,Tyler Allgeier,ARI,RB,00-0037263
+Jerome,Ford,Jerome Ford,ARI,RB,00-0037267
 Ty,Chandler,Ty Chandler,NO,RB,00-0037276
 Teagan,Quitoriano,Teagan Quitoriano,ARI,TE,00-0037277
 James,Mitchell,James Mitchell,DAL,TE,00-0037282
@@ -277,7 +282,6 @@ Ronnie,Rivers,Ronnie Rivers,LA,RB,00-0037557
 Malik,Davis,Malik Davis,DAL,RB,00-0037563
 Julius,Chestnut,Julius Chestnut,TEN,RB,00-0037594
 John,Metchie III,John Metchie III,CAR,WR,00-0037614
-Hassan,Haskins,Hassan Haskins,NE,RB,00-0037617
 Alec,Pierce,Alec Pierce,IND,WR,00-0037664
 Jalen,Tolbert,Jalen Tolbert,MIA,WR,00-0037666
 Garrett,Wilson,Garrett Wilson,NYJ,WR,00-0037740
@@ -327,6 +331,7 @@ Owen,Wright,Owen Wright,LV,RB,00-0038458
 Tommy,DeVito,Tommy DeVito,NE,QB,00-0038476
 Brady,Russell,Brady Russell,SEA,RB,00-0038488
 Ben,VanSumeren,Ben VanSumeren,KC,RB,00-0038489
+Jason,Brownlee,Jason Brownlee,NYG,WR,00-0038492
 Xavier,Gipson,Xavier Gipson,PHI,WR,00-0038496
 E.J.,Jenkins,E.J. Jenkins,PHI,TE,00-0038498
 Nikko,Remigio,Nikko Remigio,KC,WR,00-0038519
@@ -359,8 +364,10 @@ Brayden,Willis,Brayden Willis,SF,TE,00-0038643
 Ronnie,Bell,Ronnie Bell,LV,WR,00-0038647
 Tyrell,Shavers,Tyrell Shavers,BUF,WR,00-0038679
 Chris,Brooks,Chris Brooks,GB,RB,00-0038685
+Emari,Demercado,Emari Demercado,DAL,RB,00-0038705
 Blake,Whiteheart,Blake Whiteheart,CLE,TE,00-0038710
 Julian,Hill,Julian Hill,NE,TE,00-0038720
+Jared,Wayne,Jared Wayne,MIA,WR,00-0038728
 Princeton,Fant,Princeton Fant,DAL,TE,00-0038735
 Hunter,Luepke,Hunter Luepke,DAL,RB,00-0038738
 Jalen,Cropper,Jalen Cropper,NO,WR,00-0038740
@@ -368,9 +375,10 @@ Jake,Bobo,Jake Bobo,SEA,WR,00-0038752
 Nate,Adkins,Nate Adkins,DEN,TE,00-0038783
 Jaleel,McLaughlin,Jaleel McLaughlin,CLE,RB,00-0038794
 Emanuel,Wilson,Emanuel Wilson,SEA,RB,00-0038797
-Ryan,Miller,Ryan Miller,MIA,WR,00-0038824
+Ryan,Miller,Ryan Miller,NE,WR,00-0038824
 Mitchell,Tinsley,Mitchell Tinsley,CIN,WR,00-0038839
 Brycen,Tremayne,Brycen Tremayne,CAR,WR,00-0038840
+Shedrick,Jackson,Shedrick Jackson,ARI,WR,00-0038891
 Jacob,Saylors,Jacob Saylors,DET,RB,00-0038896
 Carlos,Washington,Carlos Washington,MIA,RB,00-0038930
 Dalton,Kincaid,Dalton Kincaid,BUF,TE,00-0038933
@@ -392,7 +400,6 @@ Tyjae,Spears,Tyjae Spears,TEN,RB,00-0039032
 De'Von,Achane,De'Von Achane,MIA,RB,00-0039040
 Elijah,Higgins,Elijah Higgins,ARI,TE,00-0039041
 Payne,Durham,Payne Durham,TB,TE,00-0039050
-Trey,Palmer,Trey Palmer,NO,WR,00-0039052
 Jonathan,Mingo,Jonathan Mingo,DAL,WR,00-0039062
 Zay,Flowers,Zay Flowers,BAL,WR,00-0039064
 Sam,LaPorta,Sam LaPorta,DET,TE,00-0039065
@@ -427,14 +434,14 @@ Bucky,Irving,Bucky Irving,TB,RB,00-0039361
 Isaac,Guerendo,Isaac Guerendo,SF,RB,00-0039363
 Sione,Vaki,Sione Vaki,DET,RB,00-0039364
 Jacob,Cowing,Jacob Cowing,SF,WR,00-0039365
-Audric,Estimé,Audric Estimé,MIN,RB,00-0039373
+Audric,Estimé,Audric Estimé,CLE,RB,00-0039373
 Spencer,Rattler,Spencer Rattler,NO,QB,00-0039376
 Jamari,Thrash,Jamari Thrash,LV,WR,00-0039379
 Tyrone,Tracy Jr.,Tyrone Tracy Jr.,NYG,RB,00-0039384
 Bub,Means,Bub Means,CLE,WR,00-0039386
 Kimani,Vidal,Kimani Vidal,LAC,RB,00-0039391
 Casey,Washington,Casey Washington,CAR,WR,00-0039394
-Joe,Milton III,Joe Milton III,DAL,QB,00-0039398
+Joe,Milton III,Joe Milton III,PHI,QB,00-0039398
 Jawhar,Jordan,Jawhar Jordan,HOU,RB,00-0039405
 Dylan,Laube,Dylan Laube,LV,RB,00-0039407
 Ryan,Flournoy,Ryan Flournoy,DAL,WR,00-0039410
@@ -448,7 +455,6 @@ Jalen,Coker,Jalen Coker,CAR,WR,00-0039491
 Treyton,Welch,Treyton Welch,NO,TE,00-0039518
 Brevyn,Spann-Ford,Brevyn Spann-Ford,DAL,TE,00-0039530
 Carter,Bradley,Carter Bradley,JAX,QB,00-0039534
-Shawn,Bowman,Shawn Bowman,ARI,TE,00-0039550
 Kedon,Slovis,Kedon Slovis,GB,QB,00-0039577
 Kameron,Johnson,Kameron Johnson,TB,WR,00-0039589
 British,Brooks,British Brooks,HOU,RB,00-0039603
@@ -456,6 +462,7 @@ Mason,Tipton,Mason Tipton,NO,WR,00-0039623
 Cole,Burgess,Cole Burgess,PIT,WR,00-0039626
 Cam,Grandy,Cam Grandy,MIN,TE,00-0039631
 David,Martin-Robinson,David Martin-Robinson,TEN,TE,00-0039648
+Bryce,Oliver,Bryce Oliver,HOU,WR,00-0039650
 Jabari,Small,Jabari Small,DET,RB,00-0039652
 Sam,Hartman,Sam Hartman,WAS,QB,00-0039677
 Colson,Yankoff,Colson Yankoff,WAS,TE,00-0039686
@@ -512,7 +519,6 @@ LaJohntay,Wester,LaJohntay Wester,BAL,WR,00-0040075
 Brashard,Smith,Brashard Smith,KC,RB,00-0040078
 Jake,Briningstool,Jake Briningstool,KC,TE,00-0040081
 Tre,Watson,Tre Watson,MIA,TE,00-0040094
-Xavier,Guillory,Xavier Guillory,BAL,WR,00-0040099
 Jimmy,Holiday,Jimmy Holiday,KC,WR,00-0040120
 Ashton,Jeanty,Ashton Jeanty,LV,RB,00-0040122
 Tetairoa,McMillan,Tetairoa McMillan,CAR,WR,00-0040124
@@ -536,6 +542,7 @@ Mitchell,Evans,Mitchell Evans,CAR,TE,00-0040187
 Oronde,Gadsden II,Oronde Gadsden II,LAC,TE,00-0040189
 Jackson,Hawes,Jackson Hawes,BUF,TE,00-0040194
 Ollie,Gordon II,Ollie Gordon II,MIA,RB,00-0040198
+Devin,Neal,Devin Neal,WAS,RB,00-0040202
 Will,Howard,Will Howard,PIT,QB,00-0040203
 Kalel,Mullings,Kalel Mullings,TEN,RB,00-0040205
 Riley,Leonard,Riley Leonard,IND,QB,00-0040206
@@ -562,21 +569,22 @@ A.J.,Henning,A.J. Henning,MIA,WR,00-0040302
 Theo,Wease Jr.,Theo Wease Jr.,LAC,WR,00-0040311
 Chandler,Brayboy,Chandler Brayboy,NE,WR,00-0040323
 Patrick,Herbert,Patrick Herbert,LAC,TE,00-0040331
-Eli,Pancol,Eli Pancol,IND,WR,00-0040337
 Coleman,Owen,Coleman Owen,GB,WR,00-0040352
 Stephen,Gosnell,Stephen Gosnell,BUF,WR,00-0040361
 Keleki,Latu,Keleki Latu,BUF,TE,00-0040363
 Jordan,Moore,Jordan Moore,CIN,WR,00-0040375
 Jackson,Meeks,Jackson Meeks,DET,TE,00-0040390
 Anthony,Tyus III,Anthony Tyus III,CAR,RB,00-0040394
+Brady,Cook,Brady Cook,MIA,QB,00-0040398
+Jamaal,Pritchett,Jamaal Pritchett,NYJ,WR,00-0040405
 Garrett,Greene,Garrett Greene,TB,WR,00-0040419
 Josh,Williams,Josh Williams,TB,RB,00-0040429
 Dalen,Cambre,Dalen Cambre,NYG,WR,00-0040431
 Beaux,Collins,Beaux Collins,ATL,WR,00-0040432
 Antwane,Wells Jr.,Antwane Wells Jr.,ATL,WR,00-0040438
+Luke,Grimm,Luke Grimm,LAC,WR,00-0040461
 DJ,Uiagalelei,DJ Uiagalelei,LAC,QB,00-0040464
 Raheim,Sanders,Raheim Sanders,CLE,RB,00-0040466
-Ulysses,Bentley IV,Ulysses Bentley IV,NO,RB,00-0040476
 Carter,Runyon,Carter Runyon,LV,TE,00-0040488
 Max,Brosmer,Max Brosmer,MIN,QB,00-0040494
 Dontae,Fleming,Dontae Fleming,NYG,WR,00-0040498
@@ -594,12 +602,10 @@ Efton,Chism III,Efton Chism III,NE,WR,00-0040563
 CJ,Dippre,CJ Dippre,TB,TE,00-0040566
 Brock,Lampe,Brock Lampe,BUF,RB,00-0040567
 Lan,Larison,Lan Larison,NE,RB,00-0040568
-Jeremiah,Webb,Jeremiah Webb,NE,WR,00-0040570
 Dont'e,Thornton Jr.,Dont'e Thornton Jr.,LV,WR,00-0040581
 Arian,Smith,Arian Smith,NYJ,WR,00-0040582
 Woody,Marks,Woody Marks,HOU,RB,00-0040583
 Gunnar,Helm,Gunnar Helm,TEN,TE,00-0040584
-Jaydon,Blue,Jaydon Blue,PHI,RB,00-0040586
 Kurtis,Rourke,Kurtis Rourke,SF,QB,00-0040589
 Konata,Mumpfield,Konata Mumpfield,LA,WR,00-0040590
 Brennan,Presley,Brennan Presley,LA,WR,00-0040597
@@ -623,7 +629,7 @@ Isaac,TeSlaa,Isaac TeSlaa,DET,WR,00-0040669
 Jalen,Milroe,Jalen Milroe,SEA,QB,00-0040673
 Cam,Ward,Cam Ward,TEN,QB,00-0040676
 Jaxson,Dart,Jaxson Dart,NYG,QB,00-0040691
-Jarquez,Hunter,Jarquez Hunter,MIA,RB,00-0040692
+Jarquez,Hunter,Jarquez Hunter,NO,RB,00-0040692
 Thomas,Gordon,Thomas Gordon,DET,TE,00-0040697
 Mitch,Van Vooren,Mitch Van Vooren,DAL,TE,00-0040702
 Dillon,Gabriel,Dillon Gabriel,CLE,QB,00-0040704
@@ -678,7 +684,6 @@ Dontae,McMillan,Dontae McMillan,SEA,RB,00-0040984
 Ty,Pezza,Ty Pezza,BAL,WR,00-0040986
 Roman,Hemby,Roman Hemby,LV,RB,00-0040998
 Chase,Roberts,Chase Roberts,LV,WR,00-0041004
-Corey,Rucker,Corey Rucker,LV,WR,00-0041005
 Emmett,Johnson,Emmett Johnson,KC,RB,00-0041013
 Patrick,Gurd,Patrick Gurd,LV,TE,00-0041016
 Jeremiyah,Love,Jeremiyah Love,ARI,RB,00-0041027
@@ -717,7 +722,6 @@ Jam,Miller,Jam Miller,ATL,RB,00-0041129
 Carsen,Ryan,Carsen Ryan,CLE,TE,00-0041131
 Deion,Burks,Deion Burks,IND,WR,00-0041132
 Dallen,Bentley,Dallen Bentley,DEN,TE,00-0041133
-Damon,Bankston,Damon Bankston,GB,RB,00-0041139
 Haynes,King,Haynes King,CAR,QB,00-0041149
 Hayden,Large,Hayden Large,CHI,TE,00-0041170
 Miller,Moss,Miller Moss,CHI,QB,00-0041172
@@ -730,8 +734,10 @@ Joey,Aguilar,Joey Aguilar,JAX,QB,00-0041203
 Trebor,Pena,Trebor Pena,JAX,WR,00-0041216
 J'Mari,Taylor,J'Mari Taylor,JAX,RB,00-0041217
 Michael,Wortham,Michael Wortham,JAX,WR,00-0041220
+Jackson,Acker,Jackson Acker,SEA,RB,00-0041221
 Chip,Trayanum,Chip Trayanum,NYJ,RB,00-0041239
 Kentrel,Bullock,Kentrel Bullock,CIN,RB,00-0041241
+Josh,Kattus,Josh Kattus,CIN,TE,00-0041246
 Noah,Thomas,Noah Thomas,CIN,WR,00-0041248
 Jalon,Daniels,Jalon Daniels,TB,QB,00-0041251
 Eric,Rivers Jr.,Eric Rivers Jr.,TB,WR,00-0041257
@@ -742,7 +748,6 @@ Davon,Booth,Davon Booth,IND,RB,00-0041277
 Kolbe,Katsis,Kolbe Katsis,DEN,WR,00-0041292
 Dane,Key,Dane Key,DEN,WR,00-0041293
 Cameron,Ross,Cameron Ross,DEN,WR,00-0041299
-Daniel,Sobkowicz,Daniel Sobkowicz,HOU,WR,00-0041309
 Noah,Whittington,Noah Whittington,HOU,RB,00-0041312
 Tanner,Arkin,Tanner Arkin,NE,TE,00-0041314
 Nick,DeGennaro,Nick DeGennaro,WAS,WR,00-0041317
@@ -750,7 +755,6 @@ Kyle,Dixon,Kyle Dixon,NE,WR,00-0041318
 Cameron,Dorner,Cameron Dorner,NE,WR,00-0041319
 Myles,Montgomery,Myles Montgomery,NE,RB,00-0041323
 CJ,Donaldson,CJ Donaldson,NO,RB,00-0041326
-Cody,Hardy,Cody Hardy,NYJ,TE,00-0041327
 Dillon,Bell,Dillon Bell,MIN,WR,00-0041342
 Khalil,Dinkins,Khalil Dinkins,SF,TE,00-0041357
 Wesley,Grimes,Wesley Grimes,SF,WR,00-0041359
@@ -772,7 +776,6 @@ DJ,Herman,DJ Herman,MIA,RB,00-0041436
 Carnell,Tate,Carnell Tate,TEN,WR,00-0041438
 Skyler,Bell,Skyler Bell,BUF,WR,00-0041443
 Kendrick,Law,Kendrick Law,DET,WR,00-0041446
-Brock,Rechsteiner,Brock Rechsteiner,NO,WR,00-0041451
 Luke,Altmyer,Luke Altmyer,DET,QB,00-0041453
 Miles,Kitselman,Miles Kitselman,DET,TE,00-0041457
 Lewis,Bond,Lewis Bond,HOU,WR,00-0041467
